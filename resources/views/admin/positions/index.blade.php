@@ -93,7 +93,7 @@
                                 </td>
                                 <td class="py-4 px-4 text-center">
                                     <div class="flex items-center justify-center space-x-2">
-                                        <form action="{{ route('admin.positions.destroy', $pos->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus jabatan ini?')">
+                                        <form action="{{ route('admin.positions.destroy', $pos->id) }}" method="POST" onsubmit="return confirmDelete(event, 'Jabatan {{ addslashes($pos->name) }} akan dihapus!')">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white flex items-center justify-center transition-all-200" title="Hapus Jabatan">

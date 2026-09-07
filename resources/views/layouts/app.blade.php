@@ -15,6 +15,9 @@
     <!-- Icons (FontAwesome 6) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <!-- Tailwind CSS CDN (for instant seamless rendering) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -224,31 +227,43 @@
             </header>
 
             <!-- Notification Messages -->
-            <div class="px-6 pt-4">
-                @if(session('success'))
-                    <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-2xl flex items-center justify-between shadow-sm mb-2" role="alert">
-                        <div class="flex items-center space-x-3">
-                            <i class="fa-solid fa-circle-check text-emerald-500 text-lg"></i>
-                            <span class="text-sm font-medium">{{ session('success') }}</span>
-                        </div>
-                        <button onclick="this.parentElement.remove()" class="text-emerald-500 hover:text-emerald-700">
-                            <i class="fa-solid fa-xmark text-sm"></i>
-                        </button>
-                    </div>
-                @endif
+            @if(session('success'))
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        Swal.fire({
+                            toast: true,
+                            position: "top-end",
+                            icon: "success",
+                            title: "{{ session('success') }}",
+                            showConfirmButton: false,
+                            timer: 1500,
+                            customClass: {
+                                popup: 'p-2 text-xs shadow-md rounded-xl',
+                                title: 'text-xs font-semibold'
+                            }
+                        });
+                    });
+                </script>
+            @endif
 
-                @if(session('error'))
-                    <div class="bg-rose-50 border border-rose-200 text-rose-800 px-4 py-3 rounded-2xl flex items-center justify-between shadow-sm mb-2" role="alert">
-                        <div class="flex items-center space-x-3">
-                            <i class="fa-solid fa-circle-exclamation text-rose-500 text-lg"></i>
-                            <span class="text-sm font-medium">{{ session('error') }}</span>
-                        </div>
-                        <button onclick="this.parentElement.remove()" class="text-rose-500 hover:text-rose-700">
-                            <i class="fa-solid fa-xmark text-sm"></i>
-                        </button>
-                    </div>
-                @endif
-            </div>
+            @if(session('error'))
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        Swal.fire({
+                            toast: true,
+                            position: "top-end",
+                            icon: "error",
+                            title: "{{ session('error') }}",
+                            showConfirmButton: false,
+                            timer: 2500,
+                            customClass: {
+                                popup: 'p-2 text-xs shadow-md rounded-xl',
+                                title: 'text-xs font-semibold'
+                            }
+                        });
+                    });
+                </script>
+            @endif
 
             <!-- Page Main Body -->
             <main class="flex-1 px-6 py-6">
@@ -262,5 +277,28 @@
         </div>
 
     </div>
+
+    <script>
+        function confirmDelete(event, text = "You won't be able to revert this!", title = "Apakah benar?") {
+            event.preventDefault();
+            const form = event.target || event.currentTarget;
+            
+            Swal.fire({
+                title: title,
+                text: text,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "iya",
+                cancelButtonText: "Batal"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+            return false;
+        }
+    </script>
 </body>
 </html>

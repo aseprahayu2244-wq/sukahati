@@ -101,7 +101,7 @@
                                 <a href="{{ route('documents.edit', $doc->id) }}" class="p-1 text-slate-400 hover:text-amber-600 text-xs" title="Edit Dokumen">
                                     <i class="fa-solid fa-pen-to-square"></i>
                                 </a>
-                                <form action="{{ route('documents.destroy', $doc->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus dokumen ini?')">
+                                <form action="{{ route('documents.destroy', $doc->id) }}" method="POST" onsubmit="return confirmDelete(event, 'Berkas {{ addslashes($doc->title) }} akan dihapus permanen!')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="p-1 text-slate-400 hover:text-rose-600 text-xs" title="Hapus Dokumen">

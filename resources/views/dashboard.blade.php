@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="headerTitle">Dashboard Overview</x-slot>
+    <x-slot name="headerTitle">Dashboard  admin</x-slot>
     <x-slot name="breadcrumb">
         <span>Beranda</span>
         <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>

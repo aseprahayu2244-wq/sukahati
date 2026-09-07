@@ -18,13 +18,15 @@ class DocumentController extends Controller
         abort_unless(in_array($type, $this->validTypes), 404);
 
         $divisions = Division::withCount([
-            'documents as doc_count' => fn($q) => $q->where('type', $type)
+            'documents as doc_count' => fn($q) => $q->where('type', $type),
+            'positions'
         ])->orderBy('order')->get();
 
-        $typeLabel = Document::$typeLabels[$type];
-        $typeColor = Document::$typeColors[$type];
+        $typeLabel = Document::$typeLabels[$type] ?? strtoupper($type);
+        $typeName  = $typeLabel;
+        $typeColor = Document::$typeColors[$type] ?? '#3b82f6';
 
-        return view('documents.index', compact('type', 'typeLabel', 'typeColor', 'divisions'));
+        return view('documents.index', compact('type', 'typeName', 'typeLabel', 'typeColor', 'divisions'));
     }
 
     /** Browse: Show positions within a division */
@@ -39,10 +41,11 @@ class DocumentController extends Controller
             ->orderBy('order')
             ->get();
 
-        $typeLabel = Document::$typeLabels[$type];
-        $typeColor = Document::$typeColors[$type];
+        $typeLabel = Document::$typeLabels[$type] ?? strtoupper($type);
+        $typeName  = $typeLabel;
+        $typeColor = Document::$typeColors[$type] ?? '#3b82f6';
 
-        return view('documents.positions', compact('type', 'typeLabel', 'typeColor', 'division', 'positions'));
+        return view('documents.positions', compact('type', 'typeName', 'typeLabel', 'typeColor', 'division', 'positions'));
     }
 
     /** Browse: Show documents for a position */
@@ -57,10 +60,11 @@ class DocumentController extends Controller
             ->latest()
             ->get();
 
-        $typeLabel = Document::$typeLabels[$type];
-        $typeColor = Document::$typeColors[$type];
+        $typeLabel = Document::$typeLabels[$type] ?? strtoupper($type);
+        $typeName  = $typeLabel;
+        $typeColor = Document::$typeColors[$type] ?? '#3b82f6';
 
-        return view('documents.files', compact('type', 'typeLabel', 'typeColor', 'division', 'position', 'documents'));
+        return view('documents.files', compact('type', 'typeName', 'typeLabel', 'typeColor', 'division', 'position', 'documents'));
     }
 
     /** Preview a document */
@@ -84,12 +88,14 @@ class DocumentController extends Controller
         $positions = collect();
         $type      = $request->query('type', 'sop');
         $divisionId = $request->query('division_id');
+        $selectedType = $type;
+        $selectedDivisionId = $divisionId;
 
         if ($divisionId) {
             $positions = Position::where('division_id', $divisionId)->orderBy('order')->get();
         }
 
-        return view('admin.documents.create', compact('divisions', 'positions', 'type'));
+        return view('admin.documents.create', compact('divisions', 'positions', 'type', 'selectedType', 'selectedDivisionId'));
     }
 
     /** Store uploaded document */

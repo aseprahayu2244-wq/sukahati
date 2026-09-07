@@ -41,7 +41,7 @@
                         <i class="fa-solid fa-folder"></i>
                     </div>
                     <span class="bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-full border border-slate-200 group-hover:bg-blue-50 group-hover:text-blue-600 transition-all-200">
-                        {{ $division->documents_count }} File
+                        {{ $division->doc_count ?? 0 }} File
                     </span>
                 </div>
                 <h3 class="font-bold text-slate-900 text-lg group-hover:text-blue-600 transition-all-200 line-clamp-1">{{ $division->name }}</h3>

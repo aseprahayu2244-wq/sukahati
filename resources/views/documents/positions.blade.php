@@ -43,7 +43,7 @@
                         <i class="fa-solid fa-folder-closed"></i>
                     </div>
                     <span class="bg-indigo-50 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full border border-indigo-100 group-hover:bg-white transition-all-200">
-                        {{ $position->documents_count }} File
+                        {{ $position->doc_count ?? 0 }} File
                     </span>
                 </div>
                 <h3 class="font-bold text-slate-900 text-lg group-hover:text-blue-600 transition-all-200 line-clamp-1">{{ $position->name }}</h3>
