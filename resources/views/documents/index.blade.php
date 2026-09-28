@@ -19,16 +19,7 @@
         </div>
 
         @if(auth()->check() && auth()->user()->isKetua())
-        <div class="flex items-center space-x-3">
-            <a href="{{ route('admin.divisions.index') }}" class="inline-flex items-center space-x-2 text-xs font-semibold px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-all-200">
-                <i class="fa-solid fa-layer-group"></i>
-                <span>Kelola Master Divisi</span>
-            </a>
-            <a href="{{ route('documents.create', ['type' => $type]) }}" class="inline-flex items-center space-x-2 text-xs font-bold px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-md shadow-blue-500/20 transition-all-200">
-                <i class="fa-solid fa-plus"></i>
-                <span>Tambah Dokumen Baru</span>
-            </a>
-        </div>
+     
         @endif
     </div>
 

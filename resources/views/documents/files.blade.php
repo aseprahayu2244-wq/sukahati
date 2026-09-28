@@ -57,9 +57,13 @@
                 <div>
                     <!-- Top File Header -->
                     <div class="flex items-start justify-between mb-4">
-                        <div class="w-12 h-12 rounded-xl flex items-center justify-center text-xl shrink-0 
-                            {{ str_contains($doc->file_type, 'pdf') ? 'bg-red-50 text-red-600 border border-red-200' : (str_contains($doc->file_type, 'image') ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-blue-50 text-blue-600 border border-blue-200') }}">
-                            <i class="{{ str_contains($doc->file_type, 'pdf') ? 'fa-solid fa-file-pdf' : (str_contains($doc->file_type, 'image') ? 'fa-solid fa-file-image' : 'fa-solid fa-file-lines') }}"></i>
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-12 h-12 rounded-xl flex items-center justify-center text-xl shrink-0 {{ $doc->getFileColorClass() }} shadow-sm">
+                                <i class="{{ $doc->getFileIconClass() }}"></i>
+                            </div>
+                            <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md tracking-wider {{ $doc->getFileColorClass() }}">
+                                {{ $doc->getFileBadgeLabel() }}
+                            </span>
                         </div>
 
                         <!-- Dropdown Menu / Quick actions -->

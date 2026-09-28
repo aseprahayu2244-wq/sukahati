@@ -66,6 +66,79 @@ class Document extends Model
         return in_array(strtolower($this->file_extension), $previewable);
     }
 
+    public function getFileIconClass(): string
+    {
+        $ext = strtolower($this->file_extension ?? pathinfo($this->file_name ?? '', PATHINFO_EXTENSION));
+        $mime = strtolower($this->file_type ?? '');
+
+        if ($ext === 'pdf' || str_contains($mime, 'pdf')) {
+            return 'fa-solid fa-file-pdf';
+        }
+        if (in_array($ext, ['doc', 'docx']) || str_contains($mime, 'word') || str_contains($mime, 'officedocument.wordprocessingml')) {
+            return 'fa-solid fa-file-word';
+        }
+        if (in_array($ext, ['xls', 'xlsx', 'csv']) || str_contains($mime, 'excel') || str_contains($mime, 'spreadsheetml') || str_contains($mime, 'csv')) {
+            return 'fa-solid fa-file-excel';
+        }
+        if (in_array($ext, ['ppt', 'pptx']) || str_contains($mime, 'powerpoint') || str_contains($mime, 'presentationml')) {
+            return 'fa-solid fa-file-powerpoint';
+        }
+        if (in_array($ext, ['mp4', 'mkv', 'avi', 'mov', 'webm']) || str_contains($mime, 'video')) {
+            return 'fa-solid fa-file-video';
+        }
+        if (in_array($ext, ['mp3', 'wav', 'ogg', 'm4a']) || str_contains($mime, 'audio')) {
+            return 'fa-solid fa-file-audio';
+        }
+        if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']) || str_contains($mime, 'image')) {
+            return 'fa-solid fa-file-image';
+        }
+        if (in_array($ext, ['zip', 'rar', '7z', 'tar', 'gz']) || str_contains($mime, 'zip') || str_contains($mime, 'compressed')) {
+            return 'fa-solid fa-file-zipper';
+        }
+        if (in_array($ext, ['txt', 'rtf']) || str_contains($mime, 'text')) {
+            return 'fa-solid fa-file-lines';
+        }
+        return 'fa-solid fa-file';
+    }
+
+    public function getFileColorClass(): string
+    {
+        $ext = strtolower($this->file_extension ?? pathinfo($this->file_name ?? '', PATHINFO_EXTENSION));
+        $mime = strtolower($this->file_type ?? '');
+
+        if ($ext === 'pdf' || str_contains($mime, 'pdf')) {
+            return 'bg-red-50 text-red-600 border border-red-200';
+        }
+        if (in_array($ext, ['doc', 'docx']) || str_contains($mime, 'word') || str_contains($mime, 'officedocument.wordprocessingml')) {
+            return 'bg-blue-50 text-blue-600 border border-blue-200';
+        }
+        if (in_array($ext, ['xls', 'xlsx', 'csv']) || str_contains($mime, 'excel') || str_contains($mime, 'spreadsheetml') || str_contains($mime, 'csv')) {
+            return 'bg-emerald-50 text-emerald-600 border border-emerald-200';
+        }
+        if (in_array($ext, ['ppt', 'pptx']) || str_contains($mime, 'powerpoint') || str_contains($mime, 'presentationml')) {
+            return 'bg-amber-50 text-amber-600 border border-amber-200';
+        }
+        if (in_array($ext, ['mp4', 'mkv', 'avi', 'mov', 'webm']) || str_contains($mime, 'video')) {
+            return 'bg-purple-50 text-purple-600 border border-purple-200';
+        }
+        if (in_array($ext, ['mp3', 'wav', 'ogg', 'm4a']) || str_contains($mime, 'audio')) {
+            return 'bg-cyan-50 text-cyan-600 border border-cyan-200';
+        }
+        if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']) || str_contains($mime, 'image')) {
+            return 'bg-rose-50 text-rose-600 border border-rose-200';
+        }
+        if (in_array($ext, ['zip', 'rar', '7z', 'tar', 'gz'])) {
+            return 'bg-slate-100 text-slate-700 border border-slate-300';
+        }
+        return 'bg-slate-50 text-slate-600 border border-slate-200';
+    }
+
+    public function getFileBadgeLabel(): string
+    {
+        $ext = strtolower($this->file_extension ?? pathinfo($this->file_name ?? '', PATHINFO_EXTENSION));
+        return strtoupper($ext ?: 'FILE');
+    }
+
     public function getFileIcon(): string
     {
         return match(strtolower($this->file_extension ?? '')) {

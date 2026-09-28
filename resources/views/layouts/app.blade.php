@@ -56,32 +56,24 @@
 <body class="h-full bg-slate-50 text-slate-800 antialiased font-sans">
     <div class="min-h-screen flex flex-col md:flex-row">
         
-        <!-- Sidebar Navigation -->
-        <aside class="w-full md:w-72 bg-slate-900 text-white flex-shrink-0 flex flex-col justify-between shadow-xl min-h-screen">
+        <!-- Sidebar Navigation (Terkunci / Sticky saat layar kanan di-scroll) -->
+        <aside class="w-full md:w-72 bg-slate-900 text-white flex-shrink-0 flex flex-col justify-between shadow-xl md:sticky md:top-0 md:h-screen md:overflow-y-auto z-40">
             <div>
                 <!-- Brand Header -->
                 <div class="px-6 py-6 border-b border-slate-800/80 flex items-center justify-between">
                     <a href="{{ route('dashboard') }}" class="flex items-center space-x-3 group">
-                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:scale-105 transition-all-200">
-                            <i class="fa-solid fa-folder-tree text-white text-lg"></i>
+                        <div class="w-10 h-10 rounded-xl bg-white p-1 flex items-center justify-center shadow-lg shadow-black/20 group-hover:scale-105 transition-all-200 flex-shrink-0">
+                            <img src="{{ asset('images/logo-sukahati.png') }}" alt="CV. Sukahati Pratama" class="w-full h-full object-contain">
                         </div>
                         <div>
                             <h1 class="font-extrabold text-lg text-white tracking-wider leading-none">SIMD <span class="text-blue-400">HRD</span></h1>
-                            <p class="text-[10px] text-slate-400 tracking-wider uppercase font-semibold mt-1">Dokumen System</p>
+                            <p class="text-[10px] text-slate-400 tracking-wider uppercase font-semibold mt-1">CV. Sukahati Pratama</p>
                         </div>
                     </a>
                 </div>
 
                 <!-- Global Search Quick Bar -->
-                <div class="px-4 py-4">
-                    <form action="{{ route('search') }}" method="GET">
-                        <div class="relative">
-                            <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari semua dokumen..." 
-                                class="w-full bg-slate-800/90 text-slate-200 placeholder-slate-400 text-xs rounded-xl pl-9 pr-4 py-2.5 border border-slate-700/60 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all-200">
-                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
-                        </div>
-                    </form>
-                </div>
+               
 
                 <!-- Navigation Links -->
                 <nav class="px-4 space-y-6 py-2">
@@ -212,10 +204,7 @@
                 </div>
 
                 <div class="flex items-center space-x-4">
-                    <a href="{{ route('search') }}" class="inline-flex items-center space-x-2 text-xs font-semibold px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-all-200">
-                        <i class="fa-solid fa-magnifying-glass text-slate-500"></i>
-                        <span>Pencarian Dokumen</span>
-                    </a>
+                    
 
                     @if(auth()->check() && auth()->user()->isKetua())
                     <a href="{{ route('documents.create') }}" class="inline-flex items-center space-x-2 text-xs font-bold px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl shadow-md shadow-blue-500/20 transition-all-200">

@@ -179,7 +179,7 @@
                 </h3>
                 <p class="text-xs text-slate-500 mt-0.5">Daftar file HRD terbaru yang diunggah ke sistem</p>
             </div>
-            <a href="{{ route('search') }}" class="text-xs font-bold text-blue-600 hover:text-blue-800">Lihat Semua Dokumen &rarr;</a>
+            <a href="{{ route('documents.index', 'sop') }}" class="text-xs font-bold text-blue-600 hover:text-blue-800">Lihat Semua Dokumen &rarr;</a>
         </div>
 
         @if(isset($recentDocuments) && $recentDocuments->count() > 0)
@@ -199,9 +199,8 @@
                             <tr class="hover:bg-slate-50/80 transition-all-200">
                                 <td class="py-4 px-4">
                                     <div class="flex items-center space-x-3">
-                                        <div class="w-9 h-9 rounded-xl flex items-center justify-center text-base shrink-0 
-                                            {{ str_contains($doc->file_type, 'pdf') ? 'bg-red-50 text-red-600' : (str_contains($doc->file_type, 'image') ? 'bg-emerald-50 text-emerald-600' : 'bg-blue-50 text-blue-600') }}">
-                                            <i class="{{ str_contains($doc->file_type, 'pdf') ? 'fa-solid fa-file-pdf' : (str_contains($doc->file_type, 'image') ? 'fa-solid fa-file-image' : 'fa-solid fa-file-lines') }}"></i>
+                                        <div class="w-9 h-9 rounded-xl flex items-center justify-center text-base shrink-0 {{ $doc->getFileColorClass() }} shadow-sm">
+                                            <i class="{{ $doc->getFileIconClass() }}"></i>
                                         </div>
                                         <div>
                                             <p class="font-bold text-slate-800 text-sm line-clamp-1">{{ $doc->title }}</p>
