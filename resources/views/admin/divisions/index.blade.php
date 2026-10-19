@@ -1,9 +1,9 @@
 <x-app-layout>
-    <x-slot name="headerTitle">Kelola Master Divisi</x-slot>
+    <x-slot name="headerTitle">Kelola Departemen</x-slot>
     <x-slot name="breadcrumb">
         <a href="{{ route('dashboard') }}" class="hover:underline">Beranda</a>
         <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
-        <span class="text-slate-800 font-semibold">Kelola Divisi</span>
+        <span class="text-slate-800 font-semibold">Kelola Departemen</span>
     </x-slot>
 
     <!-- Top Summary Banner -->
@@ -15,19 +15,19 @@
                 <i class="fa-solid fa-layer-group"></i>
             </div>
             <div>
-                <h1 class="text-xl font-extrabold tracking-tight">Manajemen Master Divisi</h1>
-                <p class="text-xs text-slate-300 mt-1">Tambah, perbarui, dan atur hirarki divisi organisasi HRD secara terpusat.</p>
+                <h1 class="text-xl font-extrabold tracking-tight">Manajemen Departemen</h1>
+                <p class="text-xs text-slate-300 mt-1">Tambah, perbarui, dan atur departemen berdasarkan BOD induk.</p>
             </div>
         </div>
 
         <div class="flex items-center space-x-4 relative z-10 shrink-0">
             <div class="bg-white/10 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-white/10 text-center">
-                <p class="text-[10px] uppercase tracking-wider font-bold text-slate-300">Total Divisi</p>
-                <p class="text-lg font-extrabold text-white">{{ $divisions->count() }}</p>
+                <p class="text-[10px] uppercase tracking-wider font-bold text-slate-300">Total Departemen</p>
+                <p class="text-lg font-extrabold text-white">{{ $departments->count() }}</p>
             </div>
             <div class="bg-white/10 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-white/10 text-center">
                 <p class="text-[10px] uppercase tracking-wider font-bold text-slate-300">Total Jabatan</p>
-                <p class="text-lg font-extrabold text-blue-400">{{ $divisions->sum('positions_count') }}</p>
+                <p class="text-lg font-extrabold text-blue-400">{{ $departments->sum('positions_count') }}</p>
             </div>
         </div>
     </div>
@@ -49,15 +49,15 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <!-- Left: Form Tambah Divisi Baru -->
+        <!-- Left: Form Tambah Departemen -->
         <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm h-fit">
             <div class="flex items-center space-x-3 mb-5 pb-3 border-b border-slate-100">
                 <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg">
                     <i class="fa-solid fa-plus"></i>
                 </div>
                 <div>
-                    <h3 class="text-base font-extrabold text-slate-900">Tambah Divisi Baru</h3>
-                    <p class="text-[11px] text-slate-500">Buat divisi unit kerja baru</p>
+                    <h3 class="text-base font-extrabold text-slate-900">Tambah Departemen Baru</h3>
+                    <p class="text-[11px] text-slate-500">Buat departemen baru dalam BOD</p>
                 </div>
             </div>
 
@@ -65,218 +65,172 @@
                 @csrf
                 
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Nama Divisi <span class="text-rose-500">*</span></label>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">BOD Induk <span class="text-rose-500">*</span></label>
+                    <select name="bod_id" required
+                        class="w-full bg-slate-50 text-slate-800 text-xs rounded-xl px-4 py-2.5 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">-- Pilih BOD --</option>
+                        @foreach($bods as $bod)
+                            <option value="{{ $bod->id }}" {{ old('bod_id') == $bod->id ? 'selected' : '' }}>{{ $bod->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Nama Departemen <span class="text-rose-500">*</span></label>
                     <input type="text" name="name" required value="{{ old('name') }}" placeholder="Contoh: HRD, Keuangan, IT..." 
                         class="w-full bg-slate-50 text-slate-800 text-xs rounded-xl px-4 py-2.5 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Deskripsi Divisi</label>
-                    <textarea name="description" rows="3" placeholder="Deskripsi peran dan tanggung jawab divisi..." 
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Deskripsi Departemen</label>
+                    <textarea name="description" rows="3" placeholder="Deskripsi peran dan tanggung jawab departemen..." 
                         class="w-full bg-slate-50 text-slate-800 text-xs rounded-xl px-4 py-2.5 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">{{ old('description') }}</textarea>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Warna Label</label>
-                        <div class="flex items-center space-x-2">
-                            <input type="color" id="addColorPicker" name="color" value="{{ old('color', '#3b82f6') }}" 
-                                class="w-9 h-9 rounded-xl border border-slate-200 cursor-pointer p-0.5 bg-white">
-                            <span id="addColorHex" class="text-xs font-mono text-slate-600 font-semibold">{{ old('color', '#3b82f6') }}</span>
-                        </div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Warna</label>
+                        <input type="color" name="color" value="{{ old('color', '#3b82f6') }}" 
+                            class="w-full h-9 rounded-lg border border-slate-200 cursor-pointer">
                     </div>
-
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Urutan Tampil <span class="text-rose-500">*</span></label>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Urutan <span class="text-rose-500">*</span></label>
                         <input type="number" name="order" min="1" required value="{{ old('order', $nextOrder) }}" 
                             class="w-full bg-slate-50 text-slate-800 text-xs rounded-xl px-4 py-2.5 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <p class="text-[10px] text-slate-400 mt-0.5">Nomor urut tidak boleh sama</p>
-                    </div>
-                </div>
-
-                <!-- Palette options -->
-                <div>
-                    <label class="block text-[11px] font-semibold text-slate-400 mb-1.5">Pilih Warna Cepat:</label>
-                    <div class="flex items-center space-x-2">
-                        <button type="button" onclick="setAddColor('#3b82f6')" class="w-6 h-6 rounded-full bg-blue-500 hover:scale-110 transition-all"></button>
-                        <button type="button" onclick="setAddColor('#10b981')" class="w-6 h-6 rounded-full bg-emerald-500 hover:scale-110 transition-all"></button>
-                        <button type="button" onclick="setAddColor('#8b5cf6')" class="w-6 h-6 rounded-full bg-purple-500 hover:scale-110 transition-all"></button>
-                        <button type="button" onclick="setAddColor('#f59e0b')" class="w-6 h-6 rounded-full bg-amber-500 hover:scale-110 transition-all"></button>
-                        <button type="button" onclick="setAddColor('#f43f5e')" class="w-6 h-6 rounded-full bg-rose-500 hover:scale-110 transition-all"></button>
-                        <button type="button" onclick="setAddColor('#6366f1')" class="w-6 h-6 rounded-full bg-indigo-500 hover:scale-110 transition-all"></button>
                     </div>
                 </div>
 
                 <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-3 rounded-xl shadow-md shadow-blue-500/20 transition-all-200 flex items-center justify-center space-x-2">
-                    <i class="fa-solid fa-floppy-disk"></i>
-                    <span>Simpan Divisi Baru</span>
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Tambah Departemen</span>
                 </button>
             </form>
         </div>
 
-        <!-- Right: Division List Table -->
-        <div class="lg:col-span-2 bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm flex flex-col justify-between">
-            <div>
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 pb-3 border-b border-slate-100">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg">
-                            <i class="fa-solid fa-list-check"></i>
+        <!-- Right: Departments List -->
+        <div class="lg:col-span-2 space-y-4">
+            @forelse($departments as $dept)
+                <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 rounded-xl flex items-center justify-center text-white text-xl shadow-sm" style="background-color: {{ $dept->color }}">
+                                <i class="fa-solid fa-layer-group"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-900 text-base">{{ $dept->name }}</h4>
+                                <p class="text-[11px] text-slate-500">{{ $dept->description ?? 'Tidak ada deskripsi' }}</p>
+                                <div class="flex items-center space-x-2 mt-1 flex-wrap gap-1">
+                                    <span class="text-[10px] bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full font-semibold">
+                                        <i class="fa-solid fa-building mr-1"></i>{{ $dept->bod?->name ?? 'Tanpa BOD' }}
+                                    </span>
+                                    <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-semibold">
+                                        Urutan #{{ $dept->order }}
+                                    </span>
+                                    <span class="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-semibold">
+                                        {{ $dept->positions_count ?? 0 }} Jabatan
+                                    </span>
+                                    <span class="text-[10px] bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full font-semibold">
+                                        {{ $dept->documents_count ?? 0 }} Dokumen
+                                    </span>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <h3 class="text-base font-extrabold text-slate-900">Daftar Divisi Terdaftar</h3>
-                            <p class="text-[11px] text-slate-500">Kelola dan update data divisi organisasi</p>
+
+                        <div class="flex items-center space-x-2">
+                            <!-- Edit Button -->
+                            <button onclick="openEditModal({{ $dept->id }}, {{ $dept->bod_id ?? 'null' }}, '{{ addslashes($dept->name) }}', '{{ addslashes($dept->description ?? '') }}', '{{ $dept->color }}', {{ $dept->order }})"
+                                class="px-3 py-1.5 text-xs font-semibold bg-amber-50 text-amber-600 hover:bg-amber-100 rounded-lg transition-all-200 flex items-center space-x-1">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                                <span>Edit</span>
+                            </button>
+
+                            <!-- Delete Button -->
+                            <form action="{{ route('admin.divisions.destroy', $dept->id) }}" method="POST" 
+                                onsubmit="return confirmDelete(event, 'Departemen {{ addslashes($dept->name) }} akan dihapus permanen!')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="px-3 py-1.5 text-xs font-semibold bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg transition-all-200 flex items-center space-x-1">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                    <span>Hapus</span>
+                                </button>
+                            </form>
                         </div>
                     </div>
-
-                    <!-- Live search -->
-                    <div class="relative w-full sm:w-64">
-                        <input type="text" id="divisionSearchInput" onkeyup="filterDivisions()" placeholder="Cari divisi..." 
-                            class="w-full bg-slate-50 text-slate-800 placeholder-slate-400 text-xs rounded-xl pl-9 pr-4 py-2 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
-                    </div>
                 </div>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm text-slate-600" id="divisionTable">
-                        <thead class="bg-slate-50 text-slate-500 font-semibold text-[11px] uppercase tracking-wider border-b border-slate-200">
-                            <tr>
-                                <th class="py-3 px-4">Urutan</th>
-                                <th class="py-3 px-4">Nama Divisi</th>
-                                <th class="py-3 px-4 text-center">Jumlah Jabatan</th>
-                                <th class="py-3 px-4 text-center">Jumlah Dokumen</th>
-                                <th class="py-3 px-4 text-center">Aksi (CRUD)</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100">
-                            @forelse($divisions as $div)
-                                <tr class="division-row hover:bg-slate-50/80 transition-all-200" data-name="{{ strtolower($div->name) }}">
-                                    <td class="py-4 px-4 font-mono text-xs font-bold text-slate-400">
-                                        #{{ $div->order }}
-                                    </td>
-                                    <td class="py-4 px-4">
-                                        <div class="flex items-center space-x-3">
-                                            <span class="w-3.5 h-3.5 rounded-full shrink-0 shadow-sm" style="background-color: {{ $div->color ?? '#3b82f6' }}"></span>
-                                            <div>
-                                                <p class="font-bold text-slate-900 text-sm">{{ $div->name }}</p>
-                                                <p class="text-xs text-slate-400 mt-0.5 line-clamp-1">{{ $div->description ?? 'Tidak ada deskripsi' }}</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="py-4 px-4 text-center">
-                                        <span class="bg-blue-50 text-blue-700 font-bold text-xs px-3 py-1 rounded-full border border-blue-200 inline-flex items-center space-x-1">
-                                            <i class="fa-solid fa-id-badge text-[10px]"></i>
-                                            <span>{{ $div->positions_count }} Jabatan</span>
-                                        </span>
-                                    </td>
-                                    <td class="py-4 px-4 text-center">
-                                        <span class="bg-emerald-50 text-emerald-700 font-bold text-xs px-3 py-1 rounded-full border border-emerald-200 inline-flex items-center space-x-1">
-                                            <i class="fa-solid fa-file text-[10px]"></i>
-                                            <span>{{ $div->documents_count }} File</span>
-                                        </span>
-                                    </td>
-                                    <td class="py-4 px-4 text-center">
-                                        <div class="flex items-center justify-center space-x-2">
-                                            <!-- Edit Button -->
-                                            <button type="button" 
-                                                onclick="openEditModal('{{ $div->id }}', '{{ addslashes($div->name) }}', '{{ addslashes($div->description ?? '') }}', '{{ $div->color ?? '#3b82f6' }}', '{{ $div->order }}')"
-                                                class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white flex items-center justify-center transition-all-200" title="Edit Divisi">
-                                                <i class="fa-solid fa-pen-to-square text-xs"></i>
-                                            </button>
-
-                                            <!-- Delete Button -->
-                                            <form action="{{ route('admin.divisions.destroy', $div->id) }}" method="POST" onsubmit="return confirmDelete(event, 'Divisi {{ addslashes($div->name) }} dan jabatannya akan dihapus!')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white flex items-center justify-center transition-all-200" title="Hapus Divisi">
-                                                    <i class="fa-solid fa-trash-can text-xs"></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="text-center py-12 text-slate-400 text-xs">
-                                        <i class="fa-solid fa-folder-open text-4xl text-slate-300 mb-2"></i>
-                                        <p class="font-semibold text-slate-600">Belum ada divisi terdaftar.</p>
-                                        <p class="text-[11px] text-slate-400">Gunakan form di samping untuk membuat divisi baru.</p>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+            @empty
+                <div class="bg-white rounded-3xl p-12 text-center border border-slate-200">
+                    <i class="fa-solid fa-layer-group text-5xl text-slate-200 mb-4"></i>
+                    <h3 class="text-base font-bold text-slate-700">Belum Ada Departemen</h3>
+                    <p class="text-xs text-slate-500 mt-1">Tambahkan departemen pertama menggunakan form di sebelah kiri.</p>
                 </div>
-            </div>
+            @endforelse
         </div>
-
     </div>
 
-    <!-- Edit Division Modal Dialog -->
-    <div id="editDivisionModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden transition-all duration-300">
-        <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-2xl w-full max-w-lg mx-4 transform transition-all scale-95 duration-200">
-            <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+    <!-- Edit Modal -->
+    <div id="editModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl mx-4">
+            <div class="flex items-center justify-between mb-5 pb-3 border-b border-slate-100">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg">
                         <i class="fa-solid fa-pen-to-square"></i>
                     </div>
                     <div>
-                        <h3 class="text-base font-extrabold text-slate-900">Edit Data Divisi</h3>
-                        <p class="text-[11px] text-slate-500">Perbarui informasi divisi organisasi</p>
+                        <h3 class="text-base font-extrabold text-slate-900">Edit Departemen</h3>
+                        <p class="text-[11px] text-slate-500">Perbarui data departemen</p>
                     </div>
                 </div>
-                <button type="button" onclick="closeEditModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center transition-all">
-                    <i class="fa-solid fa-xmark text-sm"></i>
+                <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-700">
+                    <i class="fa-solid fa-xmark text-xl"></i>
                 </button>
             </div>
 
-            <form id="editDivisionForm" action="" method="POST" class="space-y-4">
+            <form id="editForm" method="POST" class="space-y-4">
                 @csrf
                 @method('PUT')
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Nama Divisi <span class="text-rose-500">*</span></label>
-                    <input type="text" id="editName" name="name" required class="w-full bg-slate-50 text-slate-800 text-xs rounded-xl px-4 py-2.5 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">BOD Induk <span class="text-rose-500">*</span></label>
+                    <select name="bod_id" id="editBodId" required
+                        class="w-full bg-slate-50 text-slate-800 text-xs rounded-xl px-4 py-2.5 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">-- Pilih BOD --</option>
+                        @foreach($bods as $bod)
+                            <option value="{{ $bod->id }}">{{ $bod->name }}</option>
+                        @endforeach
+                    </select>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Deskripsi Divisi</label>
-                    <textarea id="editDescription" name="description" rows="3" class="w-full bg-slate-50 text-slate-800 text-xs rounded-xl px-4 py-2.5 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Nama Departemen <span class="text-rose-500">*</span></label>
+                    <input type="text" name="name" id="editName" required 
+                        class="w-full bg-slate-50 text-slate-800 text-xs rounded-xl px-4 py-2.5 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Deskripsi</label>
+                    <textarea name="description" id="editDescription" rows="3" 
+                        class="w-full bg-slate-50 text-slate-800 text-xs rounded-xl px-4 py-2.5 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Warna Label</label>
-                        <div class="flex items-center space-x-2">
-                            <input type="color" id="editColorPicker" name="color" class="w-9 h-9 rounded-xl border border-slate-200 cursor-pointer p-0.5 bg-white">
-                            <span id="editColorHex" class="text-xs font-mono text-slate-600 font-semibold">#3b82f6</span>
-                        </div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Warna</label>
+                        <input type="color" name="color" id="editColor" 
+                            class="w-full h-9 rounded-lg border border-slate-200 cursor-pointer">
                     </div>
-
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Urutan Tampil <span class="text-rose-500">*</span></label>
-                        <input type="number" id="editOrder" name="order" min="1" required class="w-full bg-slate-50 text-slate-800 text-xs rounded-xl px-4 py-2.5 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <p class="text-[10px] text-slate-400 mt-0.5">Nomor urut tidak boleh sama</p>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Urutan <span class="text-rose-500">*</span></label>
+                        <input type="number" name="order" id="editOrder" min="1" required 
+                            class="w-full bg-slate-50 text-slate-800 text-xs rounded-xl px-4 py-2.5 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-[11px] font-semibold text-slate-400 mb-1.5">Pilih Warna Cepat:</label>
-                    <div class="flex items-center space-x-2">
-                        <button type="button" onclick="setEditColor('#3b82f6')" class="w-6 h-6 rounded-full bg-blue-500 hover:scale-110 transition-all"></button>
-                        <button type="button" onclick="setEditColor('#10b981')" class="w-6 h-6 rounded-full bg-emerald-500 hover:scale-110 transition-all"></button>
-                        <button type="button" onclick="setEditColor('#8b5cf6')" class="w-6 h-6 rounded-full bg-purple-500 hover:scale-110 transition-all"></button>
-                        <button type="button" onclick="setEditColor('#f59e0b')" class="w-6 h-6 rounded-full bg-amber-500 hover:scale-110 transition-all"></button>
-                        <button type="button" onclick="setEditColor('#f43f5e')" class="w-6 h-6 rounded-full bg-rose-500 hover:scale-110 transition-all"></button>
-                        <button type="button" onclick="setEditColor('#6366f1')" class="w-6 h-6 rounded-full bg-indigo-500 hover:scale-110 transition-all"></button>
-                    </div>
-                </div>
-
-                <div class="flex items-center justify-end space-x-3 pt-4 border-t border-slate-100">
-                    <button type="button" onclick="closeEditModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition-all">
+                <div class="flex space-x-3">
+                    <button type="button" onclick="closeEditModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs py-3 rounded-xl transition-all-200">
                         Batal
                     </button>
-                    <button type="submit" class="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-md shadow-amber-600/20 transition-all flex items-center space-x-2">
-                        <i class="fa-solid fa-check"></i>
+                    <button type="submit" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs py-3 rounded-xl shadow-md transition-all-200 flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-floppy-disk"></i>
                         <span>Simpan Perubahan</span>
                     </button>
                 </div>
@@ -285,68 +239,22 @@
     </div>
 
     <script>
-        // Color sync for Add Form
-        const addColorPicker = document.getElementById('addColorPicker');
-        const addColorHex = document.getElementById('addColorHex');
-        if(addColorPicker) {
-            addColorPicker.addEventListener('input', (e) => {
-                addColorHex.innerText = e.target.value;
-            });
-        }
-        function setAddColor(hex) {
-            if(addColorPicker) {
-                addColorPicker.value = hex;
-                addColorHex.innerText = hex;
-            }
-        }
+        const routeBase = '{{ url('/admin/departments') }}';
 
-        // Color sync for Edit Form
-        const editColorPicker = document.getElementById('editColorPicker');
-        const editColorHex = document.getElementById('editColorHex');
-        if(editColorPicker) {
-            editColorPicker.addEventListener('input', (e) => {
-                editColorHex.innerText = e.target.value;
-            });
-        }
-        function setEditColor(hex) {
-            if(editColorPicker) {
-                editColorPicker.value = hex;
-                editColorHex.innerText = hex;
-            }
-        }
-
-        // Modal triggers
-        function openEditModal(id, name, description, color, order) {
-            const modal = document.getElementById('editDivisionModal');
-            const form = document.getElementById('editDivisionForm');
-            
-            form.action = `/admin/divisions/${id}`;
+        function openEditModal(id, bodId, name, description, color, order) {
+            document.getElementById('editBodId').value = bodId || '';
             document.getElementById('editName').value = name;
             document.getElementById('editDescription').value = description;
-            document.getElementById('editColorPicker').value = color || '#3b82f6';
-            document.getElementById('editColorHex').innerText = color || '#3b82f6';
-            document.getElementById('editOrder').value = order || 0;
-
-            modal.classList.remove('hidden');
+            document.getElementById('editColor').value = color;
+            document.getElementById('editOrder').value = order;
+            document.getElementById('editForm').action = routeBase + '/' + id;
+            document.getElementById('editModal').classList.remove('hidden');
+            document.getElementById('editModal').classList.add('flex');
         }
 
         function closeEditModal() {
-            const modal = document.getElementById('editDivisionModal');
-            modal.classList.add('hidden');
-        }
-
-        // Live Filter
-        function filterDivisions() {
-            const query = document.getElementById('divisionSearchInput').value.toLowerCase();
-            const rows = document.querySelectorAll('.division-row');
-            rows.forEach(row => {
-                const name = row.getAttribute('data-name');
-                if(name.includes(query)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
+            document.getElementById('editModal').classList.add('hidden');
+            document.getElementById('editModal').classList.remove('flex');
         }
     </script>
 </x-app-layout>

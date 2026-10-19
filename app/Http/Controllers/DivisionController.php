@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Bod;
 use App\Models\Division;
 use Illuminate\Http\Request;
 
@@ -9,68 +10,79 @@ class DivisionController extends Controller
 {
     public function index()
     {
-        $divisions = Division::withCount(['positions', 'documents'])->orderBy('order')->get();
+        $departments = Division::with('bod')->withCount(['positions', 'documents'])->orderBy('order')->get();
+        $bods = Bod::orderBy('order')->get();
         $nextOrder = (Division::max('order') ?? 0) + 1;
-        return view('admin.divisions.index', compact('divisions', 'nextOrder'));
+        return view('admin.divisions.index', compact('departments', 'bods', 'nextOrder'));
     }
 
     public function store(Request $request)
     {
+        // Super Admin and Admin can manage departments
+        abort_unless(auth()->user()->canManageDepartment(), 403);
+
         $request->validate([
-            'name'        => 'required|string|max:255|unique:divisions,name',
+            'bod_id'      => 'required|exists:bods,id',
+            'name'        => 'required|string|max:255',
             'description' => 'nullable|string',
             'color'       => 'nullable|string|max:7',
-            'order'       => 'required|integer|min:1|unique:divisions,order',
+            'order'       => 'required|integer|min:1',
         ], [
-            'name.required'  => 'Nama divisi wajib diisi.',
-            'name.unique'    => 'Nama divisi tersebut sudah ada.',
-            'order.required' => 'Urutan tampil wajib diisi.',
-            'order.integer'  => 'Urutan tampil harus berupa angka.',
-            'order.min'      => 'Urutan tampil minimal 1.',
-            'order.unique'   => 'Urutan tampil ' . $request->order . ' sudah digunakan oleh divisi lain. Nomor urut tidak boleh ada yang sama.',
+            'bod_id.required' => 'BOD induk wajib dipilih.',
+            'name.required'   => 'Nama departemen wajib diisi.',
+            'order.required'  => 'Urutan tampil wajib diisi.',
         ]);
 
         Division::create([
+            'bod_id'      => $request->bod_id,
             'name'        => trim($request->name),
             'description' => $request->description ? trim($request->description) : null,
             'color'       => $request->color ?? '#3b82f6',
             'order'       => (int) $request->order,
         ]);
 
-        return back()->with('success', 'Divisi "' . $request->name . '" berhasil ditambahkan!');
+        return back()->with('success', 'Departemen "' . $request->name . '" berhasil ditambahkan!');
     }
 
     public function update(Request $request, Division $division)
     {
+        abort_unless(auth()->user()->canManageDepartment(), 403);
+
         $request->validate([
-            'name'        => 'required|string|max:255|unique:divisions,name,' . $division->id,
+            'bod_id'      => 'required|exists:bods,id',
+            'name'        => 'required|string|max:255',
             'description' => 'nullable|string',
             'color'       => 'nullable|string|max:7',
-            'order'       => 'required|integer|min:1|unique:divisions,order,' . $division->id,
-        ], [
-            'name.required'  => 'Nama divisi wajib diisi.',
-            'name.unique'    => 'Nama divisi tersebut sudah digunakan oleh divisi lain.',
-            'order.required' => 'Urutan tampil wajib diisi.',
-            'order.integer'  => 'Urutan tampil harus berupa angka.',
-            'order.min'      => 'Urutan tampil minimal 1.',
-            'order.unique'   => 'Urutan tampil ' . $request->order . ' sudah digunakan oleh divisi lain. Nomor urut tidak boleh ada yang sama.',
+            'order'       => 'required|integer|min:1',
         ]);
 
         $division->update([
+            'bod_id'      => $request->bod_id,
             'name'        => trim($request->name),
             'description' => $request->description ? trim($request->description) : null,
             'color'       => $request->color ?? $division->color,
             'order'       => (int) $request->order,
         ]);
 
-        return back()->with('success', 'Divisi "' . $division->name . '" berhasil diperbarui!');
+        return back()->with('success', 'Departemen "' . $division->name . '" berhasil diperbarui!');
     }
 
     public function destroy(Division $division)
     {
+        abort_unless(auth()->user()->canManageDepartment(), 403);
+
+        // Check if department has positions or documents
+        if ($division->positions()->count() > 0) {
+            return back()->with('error', 'Departemen "' . $division->name . '" tidak bisa dihapus karena masih memiliki Jabatan. Hapus jabatan terlebih dahulu.');
+        }
+
+        if ($division->documents()->count() > 0) {
+            return back()->with('error', 'Departemen "' . $division->name . '" tidak bisa dihapus karena masih memiliki Dokumen.');
+        }
+
         $name = $division->name;
         $division->delete();
 
-        return back()->with('success', 'Divisi "' . $name . '" berhasil dihapus!');
+        return back()->with('success', 'Departemen "' . $name . '" berhasil dihapus!');
     }
 }

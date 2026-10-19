@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Bod;
 use App\Models\Division;
 use App\Models\Document;
 use App\Models\Position;
@@ -11,34 +12,49 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $totalDivisions = Division::count();
-        $totalPositions = Position::count();
-        $totalUsers     = User::count();
+        $user = auth()->user();
+
+        $totalBods       = Bod::count();
+        $totalDepartments = Division::count();
+        $totalPositions  = Position::count();
 
         $docStats = [
-            'sop'          => Document::where('type', 'sop')->count(),
-            'job'          => Document::where('type', 'job')->count(),
-            'job_analysis' => Document::where('type', 'job_analysis')->count(),
-            'bpmn'         => Document::where('type', 'bpmn')->count(),
+            'sop'      => Document::where('type', 'sop')->count(),
+            'job_desk' => Document::where('type', 'job_desk')->count(),
+            'bpm'      => Document::where('type', 'bpm')->count(),
+            'struktur' => Document::where('type', 'struktur')->count(),
         ];
 
-        $recentDocuments = Document::with(['division', 'position', 'uploader'])
+        $totalDocuments = array_sum($docStats);
+
+        $recentDocuments = Document::with(['bod', 'division', 'position', 'uploader'])
             ->latest()
             ->take(8)
             ->get();
 
-        $divisions = Division::withCount('positions')
+        $bods = Bod::withCount('departments')
             ->orderBy('order')
             ->take(6)
             ->get();
 
+        // Super Admin also sees user stats
+        $totalUsers = null;
+        $recentUsers = collect();
+        if ($user->isSuperAdmin()) {
+            $totalUsers  = User::count();
+            $recentUsers = User::latest()->take(5)->get();
+        }
+
         return view('dashboard', compact(
-            'totalDivisions',
+            'totalBods',
+            'totalDepartments',
             'totalPositions',
-            'totalUsers',
+            'totalDocuments',
             'docStats',
             'recentDocuments',
-            'divisions'
+            'bods',
+            'totalUsers',
+            'recentUsers'
         ));
     }
 }

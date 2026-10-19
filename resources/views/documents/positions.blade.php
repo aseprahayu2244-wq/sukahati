@@ -1,68 +1,74 @@
 <x-app-layout>
-    <x-slot name="headerTitle">Pilih Jabatan &bull; {{ $division->name }}</x-slot>
+    <x-slot name="headerTitle">{{ $department->name }} &bull; {{ $typeLabel }}</x-slot>
     <x-slot name="breadcrumb">
         <a href="{{ route('dashboard') }}" class="hover:underline">Beranda</a>
         <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
-        <a href="{{ route('documents.index', $type) }}" class="hover:underline">{{ $typeName }}</a>
+        <a href="{{ route('documents.index', $type) }}" class="hover:underline">{{ $typeLabel }}</a>
         <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
-        <span class="text-slate-800 font-semibold">{{ $division->name }}</span>
+        <a href="{{ route('documents.departments', [$type, $bod->id]) }}" class="hover:underline">{{ $bod->name }}</a>
+        <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+        <span class="text-slate-800 font-semibold">{{ $department->name }}</span>
     </x-slot>
 
-    <!-- Top Info Bar -->
+    <!-- Header Section -->
     <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div class="flex items-center space-x-4">
-            <div class="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center text-2xl shadow-lg shadow-amber-500/30">
-                <i class="fa-solid fa-folder-open"></i>
+            <div class="w-12 h-12 rounded-2xl text-white flex items-center justify-center text-2xl shadow-lg" style="background-color: {{ $typeColor }}">
+                <i class="fa-solid fa-id-badge"></i>
             </div>
             <div>
-                <h1 class="text-xl font-extrabold text-slate-900">{{ $typeName }} &bull; Divisi {{ $division->name }}</h1>
-                <p class="text-xs text-slate-500 mt-0.5">Pilih folder jabatan di bawah untuk membuka file dokumen {{ $typeName }}</p>
+                <h1 class="text-xl font-extrabold text-slate-900">{{ $department->name }} - Pilih Jabatan</h1>
+                <p class="text-xs text-slate-500 mt-0.5">BOD: <span class="font-semibold text-slate-700">{{ $bod->name }}</span> &bull; Pilih jabatan untuk melihat dokumen Job Desk</p>
             </div>
         </div>
 
         <div class="flex items-center space-x-3">
-            <a href="{{ route('documents.index', $type) }}" class="inline-flex items-center space-x-2 text-xs font-semibold px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-all-200">
+            <a href="{{ route('documents.departments', [$type, $bod->id]) }}" class="inline-flex items-center space-x-2 text-xs font-semibold px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-all-200">
                 <i class="fa-solid fa-arrow-left"></i>
-                <span>Kembali ke Divisi</span>
+                <span>Kembali</span>
             </a>
-            @if(auth()->check() && auth()->user()->isKetua())
-            <a href="{{ route('documents.create', ['type' => $type, 'division_id' => $division->id]) }}" class="inline-flex items-center space-x-2 text-xs font-bold px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-md shadow-blue-500/20 transition-all-200">
-                <i class="fa-solid fa-plus"></i>
-                <span>Upload Dokumen di Divisi Ini</span>
+
+            @if(auth()->check() && auth()->user()->canManageDocuments())
+            <a href="{{ route('documents.create', ['type' => $type, 'bod_id' => $bod->id, 'department_id' => $department->id]) }}" class="inline-flex items-center space-x-2 text-xs font-bold px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-md shadow-blue-500/20 transition-all-200">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <span>Upload Dokumen</span>
             </a>
             @endif
         </div>
     </div>
 
-    <!-- Position Folders Grid -->
+    <!-- Positions Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         @forelse($positions as $position)
-            <a href="{{ route('documents.files', [$type, $division->id, $position->id]) }}" class="folder-card bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm transition-all-200 group relative block">
+            <a href="{{ route('documents.files', [$type, $bod->id, $department->id, $position->id]) }}" class="folder-card bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm transition-all-200 group relative block">
                 <div class="flex items-center justify-between mb-4">
-                    <div class="w-14 h-14 rounded-2xl bg-indigo-500/10 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white flex items-center justify-center text-3xl shadow-sm transition-all-200">
-                        <i class="fa-solid fa-folder-closed"></i>
+                    <div class="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white flex items-center justify-center text-3xl shadow-sm transition-all-200">
+                        <i class="fa-solid fa-user-tie"></i>
                     </div>
-                    <span class="bg-indigo-50 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full border border-indigo-100 group-hover:bg-white transition-all-200">
+                    <span class="bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-full border border-slate-200 group-hover:bg-blue-50 group-hover:text-blue-600 transition-all-200">
                         {{ $position->doc_count ?? 0 }} File
                     </span>
                 </div>
                 <h3 class="font-bold text-slate-900 text-lg group-hover:text-blue-600 transition-all-200 line-clamp-1">{{ $position->name }}</h3>
-                <p class="text-xs text-slate-500 mt-1 line-clamp-2">{{ $position->description ?? 'Dokumen untuk jabatan ' . $position->name }}</p>
+                <p class="text-xs text-slate-500 mt-1 line-clamp-2">{{ $position->description ?? 'Jabatan ' . $position->name }}</p>
                 
                 <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-500 group-hover:text-blue-600">
-                    <span>Lihat Berkas Dokumen</span>
+                    <span class="flex items-center space-x-1">
+                        <i class="fa-solid fa-file-contract text-slate-400"></i>
+                        <span>{{ $position->doc_count ?? 0 }} Dokumen</span>
+                    </span>
                     <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-all-200"></i>
                 </div>
             </a>
         @empty
             <div class="col-span-full bg-white rounded-3xl p-12 text-center border border-slate-200">
                 <i class="fa-solid fa-folder-open text-5xl text-slate-300 mb-4"></i>
-                <h3 class="text-base font-bold text-slate-700">Belum Ada Jabatan di Divisi Ini</h3>
-                <p class="text-xs text-slate-500 mt-1">Silakan daftarkan jabatan untuk divisi {{ $division->name }} terlebih dahulu.</p>
-                @if(auth()->check() && auth()->user()->isKetua())
+                <h3 class="text-base font-bold text-slate-700">Belum Ada Jabatan</h3>
+                <p class="text-xs text-slate-500 mt-1">Belum ada jabatan dalam departemen {{ $department->name }}.</p>
+                @if(auth()->check() && auth()->user()->canManageDepartment())
                     <a href="{{ route('admin.positions.index') }}" class="inline-flex items-center space-x-2 bg-blue-600 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-md mt-4">
                         <i class="fa-solid fa-plus"></i>
-                        <span>Tambah Jabatan Sekarang</span>
+                        <span>Tambah Jabatan</span>
                     </a>
                 @endif
             </div>

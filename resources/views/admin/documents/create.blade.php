@@ -24,52 +24,78 @@
             <div>
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Kategori Dokumen <span class="text-rose-500">*</span></label>
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <label class="cursor-pointer border-2 rounded-2xl p-3 flex flex-col items-center justify-center text-center transition-all-200 hover:border-blue-500 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50/50">
-                        <input type="radio" name="type" value="sop" {{ ($selectedType ?? old('type')) === 'sop' ? 'checked' : '' }} required class="sr-only">
+                    <label class="cursor-pointer border-2 rounded-2xl p-3 flex flex-col items-center justify-center text-center transition-all-200 hover:border-emerald-500 has-[:checked]:border-emerald-600 has-[:checked]:bg-emerald-50/50">
+                        <input type="radio" name="type" value="sop" {{ old('type', $type ?? 'sop') === 'sop' ? 'checked' : '' }} required class="sr-only" onchange="togglePositionField()">
                         <i class="fa-solid fa-file-contract text-2xl text-emerald-500 mb-1"></i>
                         <span class="text-xs font-bold text-slate-800">SOP</span>
+                        <span class="text-[10px] text-slate-400">BOD &rarr; Dept &rarr; File</span>
                     </label>
 
-                    <label class="cursor-pointer border-2 rounded-2xl p-3 flex flex-col items-center justify-center text-center transition-all-200 hover:border-blue-500 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50/50">
-                        <input type="radio" name="type" value="job" {{ ($selectedType ?? old('type')) === 'job' ? 'checked' : '' }} required class="sr-only">
+                    <label class="cursor-pointer border-2 rounded-2xl p-3 flex flex-col items-center justify-center text-center transition-all-200 hover:border-amber-500 has-[:checked]:border-amber-600 has-[:checked]:bg-amber-50/50">
+                        <input type="radio" name="type" value="job_desk" {{ old('type', $type ?? '') === 'job_desk' ? 'checked' : '' }} required class="sr-only" onchange="togglePositionField()">
                         <i class="fa-solid fa-user-gear text-2xl text-amber-500 mb-1"></i>
-                        <span class="text-xs font-bold text-slate-800">Job Description</span>
+                        <span class="text-xs font-bold text-slate-800">Job Desk</span>
+                        <span class="text-[10px] text-slate-400">BOD &rarr; Dept &rarr; Jabatan</span>
                     </label>
 
-                    <label class="cursor-pointer border-2 rounded-2xl p-3 flex flex-col items-center justify-center text-center transition-all-200 hover:border-blue-500 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50/50">
-                        <input type="radio" name="type" value="job_analysis" {{ ($selectedType ?? old('type')) === 'job_analysis' ? 'checked' : '' }} required class="sr-only">
-                        <i class="fa-solid fa-magnifying-glass-chart text-2xl text-purple-500 mb-1"></i>
-                        <span class="text-xs font-bold text-slate-800">Job Analysis</span>
+                    <label class="cursor-pointer border-2 rounded-2xl p-3 flex flex-col items-center justify-center text-center transition-all-200 hover:border-purple-500 has-[:checked]:border-purple-600 has-[:checked]:bg-purple-50/50">
+                        <input type="radio" name="type" value="bpm" {{ old('type', $type ?? '') === 'bpm' ? 'checked' : '' }} required class="sr-only" onchange="togglePositionField()">
+                        <i class="fa-solid fa-diagram-project text-2xl text-purple-500 mb-1"></i>
+                        <span class="text-xs font-bold text-slate-800">BPM</span>
+                        <span class="text-[10px] text-slate-400">BOD &rarr; Dept &rarr; File</span>
                     </label>
 
-                    <label class="cursor-pointer border-2 rounded-2xl p-3 flex flex-col items-center justify-center text-center transition-all-200 hover:border-blue-500 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50/50">
-                        <input type="radio" name="type" value="bpmn" {{ ($selectedType ?? old('type')) === 'bpmn' ? 'checked' : '' }} required class="sr-only">
-                        <i class="fa-solid fa-diagram-project text-2xl text-rose-500 mb-1"></i>
-                        <span class="text-xs font-bold text-slate-800">BPMN Diagram</span>
+                    <label class="cursor-pointer border-2 rounded-2xl p-3 flex flex-col items-center justify-center text-center transition-all-200 hover:border-rose-500 has-[:checked]:border-rose-600 has-[:checked]:bg-rose-50/50">
+                        <input type="radio" name="type" value="struktur" {{ old('type', $type ?? '') === 'struktur' ? 'checked' : '' }} required class="sr-only" onchange="togglePositionField()">
+                        <i class="fa-solid fa-sitemap text-2xl text-rose-500 mb-1"></i>
+                        <span class="text-xs font-bold text-slate-800">Struktur</span>
+                        <span class="text-[10px] text-slate-400">BOD &rarr; Dept &rarr; File</span>
                     </label>
                 </div>
             </div>
 
-            <!-- Division & Position Row -->
+            <!-- Hierarchy: BOD, Departemen, Jabatan -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- BOD -->
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Divisi <span class="text-rose-500">*</span></label>
-                    <select name="division_id" id="divisionSelect" required onchange="loadPositions(this.value)" class="w-full bg-slate-50 text-slate-800 text-xs rounded-xl px-4 py-3 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="">-- Pilih Divisi --</option>
-                        @foreach($divisions as $div)
-                            <option value="{{ $div->id }}" {{ (string)($selectedDivisionId ?? old('division_id')) === (string)$div->id ? 'selected' : '' }}>
-                                {{ $div->name }}
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">BOD <span class="text-rose-500">*</span></label>
+                    <select name="bod_id" id="bodSelect" required onchange="onBodChange(this.value)" class="w-full bg-slate-50 text-slate-800 text-xs rounded-xl px-4 py-3 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">-- Pilih BOD --</option>
+                        @foreach($bods as $b)
+                            <option value="{{ $b->id }}" {{ (string)old('bod_id', $bodId ?? '') === (string)$b->id ? 'selected' : '' }}>
+                                {{ $b->name }}
                             </option>
                         @endforeach
                     </select>
                 </div>
 
+                <!-- Departemen -->
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Jabatan <span class="text-rose-500">*</span></label>
-                    <select name="position_id" id="positionSelect" required class="w-full bg-slate-50 text-slate-800 text-xs rounded-xl px-4 py-3 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="">-- Pilih Divisi Terlebih Dahulu --</option>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Departemen <span class="text-rose-500">*</span></label>
+                    <select name="division_id" id="departmentSelect" required onchange="onDepartmentChange(this.value)" class="w-full bg-slate-50 text-slate-800 text-xs rounded-xl px-4 py-3 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">-- Pilih BOD Terlebih Dahulu --</option>
+                        @foreach($departments as $dept)
+                            <option value="{{ $dept->id }}" {{ (string)old('division_id', $departmentId ?? '') === (string)$dept->id ? 'selected' : '' }}>
+                                {{ $dept->name }}
+                            </option>
+                        @endforeach
                     </select>
                 </div>
+            </div>
+
+            <!-- Jabatan (khusus Job Desk) -->
+            <div id="positionContainer" class="{{ old('type', $type ?? 'sop') === 'job_desk' ? '' : 'hidden' }}">
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                    Jabatan <span class="text-rose-500">* (Wajib untuk Job Desk)</span>
+                </label>
+                <select name="position_id" id="positionSelect" class="w-full bg-slate-50 text-slate-800 text-xs rounded-xl px-4 py-3 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">-- Pilih Departemen Terlebih Dahulu --</option>
+                    @foreach($positions as $pos)
+                        <option value="{{ $pos->id }}" {{ (string)old('position_id', $positionId ?? '') === (string)$pos->id ? 'selected' : '' }}>
+                            {{ $pos->name }}
+                        </option>
+                    @endforeach
+                </select>
             </div>
 
             <!-- Title Input -->
@@ -78,65 +104,117 @@
                 <input type="text" name="title" required value="{{ old('title') }}" placeholder="Contoh: SOP Rekrutmen Karyawan Baru 2026" class="w-full bg-slate-50 text-slate-800 text-xs rounded-xl px-4 py-3 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
 
-            <!-- Description Input -->
+            <!-- Description -->
             <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Deskripsi Dokumen (Optional)</label>
-                <textarea name="description" rows="3" placeholder="Jelaskan ringkasan atau rincian isi dokumen..." class="w-full bg-slate-50 text-slate-800 text-xs rounded-xl px-4 py-3 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">{{ old('description') }}</textarea>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Deskripsi Dokumen</label>
+                <textarea name="description" rows="3" placeholder="Tuliskan keterangan mengenai dokumen ini..." class="w-full bg-slate-50 text-slate-800 text-xs rounded-xl px-4 py-3 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">{{ old('description') }}</textarea>
             </div>
 
-            <!-- File Upload Input -->
+            <!-- File Upload Zone -->
             <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Berkas File Dokumen <span class="text-rose-500">*</span></label>
-                <div class="border-2 border-dashed border-slate-200 rounded-2xl p-6 text-center hover:border-blue-500 transition-all-200 bg-slate-50/50">
-                    <i class="fa-solid fa-file-arrow-up text-4xl text-blue-500 mb-2"></i>
-                    <p class="text-xs font-semibold text-slate-700 mb-1">Pilih atau Seret berkas di sini</p>
-                    <p class="text-[11px] text-slate-400 mb-4">Format yang didukung: PDF, DOCX, XLSX, PNG, JPG, BPMN, ZIP, RAR, MP4 (Maks. 50MB)</p>
-                    <input type="file" name="file" required class="block w-full text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer">
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Berkas File <span class="text-rose-500">*</span></label>
+                <div class="relative border-2 border-dashed border-slate-300 hover:border-blue-500 rounded-3xl p-8 text-center bg-slate-50/50 hover:bg-blue-50/30 transition-all-200 group">
+                    <input type="file" name="file" id="fileInput" required onchange="handleFileSelect(this)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                    <div id="uploadPrompt" class="flex flex-col items-center justify-center pointer-events-none">
+                        <div class="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-2xl mb-3 shadow-inner group-hover:scale-110 transition-all-200">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                        </div>
+                        <p class="text-sm font-bold text-slate-700">Klik atau geser file ke area ini untuk upload</p>
+                        <p class="text-xs text-slate-400 mt-1">Mendukung file dokumen PDF, Word, Excel, Gambar, Diagram BPMN, Zip dll (Maksimal 50MB)</p>
+                    </div>
+                    <div id="filePreview" class="hidden flex items-center justify-center space-x-3 pointer-events-none">
+                        <i class="fa-solid fa-file text-2xl text-blue-600"></i>
+                        <span id="fileName" class="text-sm font-bold text-slate-800"></span>
+                        <span id="fileSize" class="text-xs text-slate-400 font-medium"></span>
+                    </div>
                 </div>
             </div>
 
             <!-- Submit Button -->
-            <div class="pt-4 flex items-center justify-end space-x-3">
-                <button type="button" onclick="history.back()" class="px-5 py-3 rounded-xl bg-slate-100 text-slate-700 text-xs font-semibold hover:bg-slate-200 transition-all-200">
-                    Batal
-                </button>
-                <button type="submit" class="px-8 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-bold shadow-lg shadow-blue-500/20 transition-all-200">
-                    <i class="fa-solid fa-cloud-arrow-up mr-1"></i> Upload Dokumen Now
+            <div class="pt-4 flex items-center justify-between">
+                <a href="{{ url()->previous() }}" class="text-xs font-semibold text-slate-500 hover:text-slate-800 transition-all-200">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> Batal & Kembali
+                </a>
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-6 py-3.5 rounded-xl shadow-lg shadow-blue-500/25 transition-all-200 flex items-center space-x-2">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <span>Upload Dokumen Sekarang</span>
                 </button>
             </div>
         </form>
     </div>
 
-    <!-- Script for Dynamic Position Loading -->
+    @push('scripts')
     <script>
-        const initialDivision = "{{ $selectedDivisionId ?? old('division_id') }}";
-        const initialPosition = "{{ $selectedPositionId ?? old('position_id') }}";
-
-        function loadPositions(divisionId) {
+        function togglePositionField() {
+            const selectedType = document.querySelector('input[name="type"]:checked').value;
+            const container = document.getElementById('positionContainer');
             const select = document.getElementById('positionSelect');
-            select.innerHTML = '<option value="">Memuat jabatan...</option>';
-            
-            if (!divisionId) {
-                select.innerHTML = '<option value="">-- Pilih Divisi Terlebih Dahulu --</option>';
+            if (selectedType === 'job_desk') {
+                container.classList.remove('hidden');
+                select.required = true;
+            } else {
+                container.classList.add('hidden');
+                select.required = false;
+                select.value = '';
+            }
+        }
+
+        async function onBodChange(bodId) {
+            const deptSelect = document.getElementById('departmentSelect');
+            const posSelect  = document.getElementById('positionSelect');
+            deptSelect.innerHTML = '<option value="">Memuat data departemen...</option>';
+            posSelect.innerHTML  = '<option value="">-- Pilih Departemen Terlebih Dahulu --</option>';
+
+            if (!bodId) {
+                deptSelect.innerHTML = '<option value="">-- Pilih BOD Terlebih Dahulu --</option>';
                 return;
             }
 
-            fetch(`/api/divisions/${divisionId}/positions`)
-                .then(res => res.json())
-                .then(data => {
-                    select.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
-                    data.forEach(pos => {
-                        const selected = (initialPosition && String(initialPosition) === String(pos.id)) ? 'selected' : '';
-                        select.innerHTML += `<option value="${pos.id}" ${selected}>${pos.name}</option>`;
-                    });
-                })
-                .catch(() => {
-                    select.innerHTML = '<option value="">Gagal memuat jabatan</option>';
+            try {
+                const res = await fetch(`/api/bods/${bodId}/departments`);
+                const depts = await res.json();
+                deptSelect.innerHTML = '<option value="">-- Pilih Departemen --</option>';
+                depts.forEach(d => {
+                    deptSelect.innerHTML += `<option value="${d.id}">${d.name}</option>`;
                 });
+            } catch (e) {
+                deptSelect.innerHTML = '<option value="">Gagal memuat departemen</option>';
+            }
         }
 
-        if (initialDivision) {
-            loadPositions(initialDivision);
+        async function onDepartmentChange(deptId) {
+            const posSelect = document.getElementById('positionSelect');
+            posSelect.innerHTML = '<option value="">Memuat data jabatan...</option>';
+
+            if (!deptId) {
+                posSelect.innerHTML = '<option value="">-- Pilih Departemen Terlebih Dahulu --</option>';
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/departments/${deptId}/positions`);
+                const positions = await res.json();
+                posSelect.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
+                positions.forEach(p => {
+                    posSelect.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+                });
+            } catch (e) {
+                posSelect.innerHTML = '<option value="">Gagal memuat jabatan</option>';
+            }
         }
+
+        function handleFileSelect(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                document.getElementById('fileName').textContent = file.name;
+                document.getElementById('fileSize').textContent = '(' + (file.size / 1024 / 1024).toFixed(2) + ' MB)';
+                document.getElementById('uploadPrompt').classList.add('hidden');
+                document.getElementById('filePreview').classList.remove('hidden');
+            }
+        }
+
+        // Run once on load
+        document.addEventListener('DOMContentLoaded', togglePositionField);
     </script>
+    @endpush
 </x-app-layout>

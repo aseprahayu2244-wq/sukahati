@@ -1,35 +1,69 @@
 <x-app-layout>
-    <x-slot name="headerTitle">{{ $position->name }} &bull; {{ $typeName }}</x-slot>
+    {{-- Dynamic header title: show position name for job_desk, or department name for others --}}
+    @if(isset($position))
+        <x-slot name="headerTitle">{{ $position->name }} &bull; {{ $typeLabel }}</x-slot>
+    @else
+        <x-slot name="headerTitle">{{ $department->name }} &bull; {{ $typeLabel }}</x-slot>
+    @endif
+
     <x-slot name="breadcrumb">
         <a href="{{ route('dashboard') }}" class="hover:underline">Beranda</a>
         <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
-        <a href="{{ route('documents.index', $type) }}" class="hover:underline">{{ $typeName }}</a>
+        <a href="{{ route('documents.index', $type) }}" class="hover:underline">{{ $typeLabel }}</a>
         <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
-        <a href="{{ route('documents.positions', [$type, $division->id]) }}" class="hover:underline">{{ $division->name }}</a>
+        <a href="{{ route('documents.departments', [$type, $bod->id]) }}" class="hover:underline">{{ $bod->name }}</a>
         <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
-        <span class="text-slate-800 font-semibold">{{ $position->name }}</span>
+        @if(isset($position))
+            <a href="{{ route('documents.positions', [$type, $bod->id, $department->id]) }}" class="hover:underline">{{ $department->name }}</a>
+            <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+            <span class="text-slate-800 font-semibold">{{ $position->name }}</span>
+        @else
+            <span class="text-slate-800 font-semibold">{{ $department->name }}</span>
+        @endif
     </x-slot>
 
     <!-- Header Section -->
     <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div class="flex items-center space-x-4">
-            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center text-2xl shadow-lg shadow-blue-500/20">
+            <div class="w-12 h-12 rounded-2xl text-white flex items-center justify-center text-2xl shadow-lg" style="background-color: {{ $typeColor }}">
                 <i class="fa-solid fa-file-invoice"></i>
             </div>
             <div>
-                <h1 class="text-xl font-extrabold text-slate-900">{{ $typeName }} &bull; {{ $position->name }}</h1>
-                <p class="text-xs text-slate-500 mt-0.5">Divisi: <span class="font-semibold text-slate-700">{{ $division->name }}</span> &bull; Total {{ $documents->count() }} berkas dokumen</p>
+                <h1 class="text-xl font-extrabold text-slate-900">
+                    {{ $typeLabel }} &bull; {{ isset($position) ? $position->name : $department->name }}
+                </h1>
+                <p class="text-xs text-slate-500 mt-0.5">
+                    BOD: <span class="font-semibold text-slate-700">{{ $bod->name }}</span>
+                    &bull; Dept: <span class="font-semibold text-slate-700">{{ $department->name }}</span>
+                    @if(isset($position))
+                        &bull; Jabatan: <span class="font-semibold text-slate-700">{{ $position->name }}</span>
+                    @endif
+                    &bull; Total {{ $documents->count() }} berkas
+                </p>
             </div>
         </div>
 
         <div class="flex items-center space-x-3">
-            <a href="{{ route('documents.positions', [$type, $division->id]) }}" class="inline-flex items-center space-x-2 text-xs font-semibold px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-all-200">
-                <i class="fa-solid fa-arrow-left"></i>
-                <span>Kembali</span>
-            </a>
+            {{-- Back button --}}
+            @if(isset($position))
+                <a href="{{ route('documents.positions', [$type, $bod->id, $department->id]) }}" class="inline-flex items-center space-x-2 text-xs font-semibold px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-all-200">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Kembali</span>
+                </a>
+            @else
+                <a href="{{ route('documents.departments', [$type, $bod->id]) }}" class="inline-flex items-center space-x-2 text-xs font-semibold px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-all-200">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Kembali</span>
+                </a>
+            @endif
 
-            @if(auth()->check() && auth()->user()->isKetua())
-            <a href="{{ route('documents.create', ['type' => $type, 'division_id' => $division->id, 'position_id' => $position->id]) }}" class="inline-flex items-center space-x-2 text-xs font-bold px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-md shadow-blue-500/20 transition-all-200">
+            @if(auth()->check() && auth()->user()->canManageDocuments())
+            <a href="{{ route('documents.create', [
+                'type'          => $type,
+                'bod_id'        => $bod->id,
+                'department_id' => $department->id,
+                'position_id'   => isset($position) ? $position->id : null,
+            ]) }}" class="inline-flex items-center space-x-2 text-xs font-bold px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-md shadow-blue-500/20 transition-all-200">
                 <i class="fa-solid fa-cloud-arrow-up"></i>
                 <span>Upload Dokumen Di Sini</span>
             </a>
@@ -37,7 +71,7 @@
         </div>
     </div>
 
-    <!-- Search & Filter Bar -->
+    <!-- Search Bar -->
     <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div class="relative w-full sm:w-80">
             <input type="text" id="fileFilterInput" onkeyup="filterFiles()" placeholder="Cari berkas dalam folder..." class="w-full bg-slate-50 text-slate-800 placeholder-slate-400 text-xs rounded-xl pl-9 pr-4 py-2.5 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -66,7 +100,7 @@
                             </span>
                         </div>
 
-                        <!-- Dropdown Menu / Quick actions -->
+                        <!-- Quick actions -->
                         <div class="flex items-center space-x-1">
                             <a href="{{ route('documents.preview', $doc->id) }}" title="Preview Dokumen" class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-all-200">
                                 <i class="fa-solid fa-eye text-xs"></i>
@@ -100,7 +134,7 @@
                             <span>{{ $doc->created_at->format('d M Y') }}</span>
                         </span>
 
-                        @if(auth()->check() && auth()->user()->isKetua())
+                        @if(auth()->check() && auth()->user()->canManageDocuments())
                             <div class="flex items-center space-x-1">
                                 <a href="{{ route('documents.edit', $doc->id) }}" class="p-1 text-slate-400 hover:text-amber-600 text-xs" title="Edit Dokumen">
                                     <i class="fa-solid fa-pen-to-square"></i>
@@ -122,9 +156,14 @@
             <div class="col-span-full bg-white rounded-3xl p-12 text-center border border-slate-200">
                 <i class="fa-solid fa-file-circle-xmark text-5xl text-slate-300 mb-4"></i>
                 <h3 class="text-base font-bold text-slate-700">Belum Ada Dokumen</h3>
-                <p class="text-xs text-slate-500 mt-1">Belum ada file {{ $typeName }} yang diunggah untuk posisi {{ $position->name }}.</p>
-                @if(auth()->check() && auth()->user()->isKetua())
-                    <a href="{{ route('documents.create', ['type' => $type, 'division_id' => $division->id, 'position_id' => $position->id]) }}" class="inline-flex items-center space-x-2 bg-blue-600 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-md mt-4">
+                <p class="text-xs text-slate-500 mt-1">Belum ada file {{ $typeLabel }} yang diunggah di sini.</p>
+                @if(auth()->check() && auth()->user()->canManageDocuments())
+                    <a href="{{ route('documents.create', [
+                        'type'          => $type,
+                        'bod_id'        => $bod->id,
+                        'department_id' => $department->id,
+                        'position_id'   => isset($position) ? $position->id : null,
+                    ]) }}" class="inline-flex items-center space-x-2 bg-blue-600 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-md mt-4">
                         <i class="fa-solid fa-cloud-arrow-up"></i>
                         <span>Upload Dokumen Pertama</span>
                     </a>

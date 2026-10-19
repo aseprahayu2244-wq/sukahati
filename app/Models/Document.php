@@ -11,25 +11,38 @@ class Document extends Model
     use HasFactory;
 
     protected $fillable = [
-        'type', 'division_id', 'position_id', 'title', 'description',
+        'type', 'bod_id', 'division_id', 'position_id', 'title', 'description',
         'file_path', 'file_name', 'file_type', 'file_extension', 'file_size', 'uploaded_by'
     ];
 
-    // Type labels
+    // Type labels (new menu names)
     public static array $typeLabels = [
-        'sop'          => 'SOP',
-        'job'          => 'Job',
-        'job_analysis' => 'Job Analysis',
-        'bpmn'         => 'BPMN',
+        'sop'      => 'SOP',
+        'job_desk' => 'Job Desk',
+        'bpm'      => 'BPM',
+        'struktur' => 'Struktur',
     ];
 
     // Type colors
     public static array $typeColors = [
-        'sop'          => '#3b82f6',
-        'job'          => '#10b981',
-        'job_analysis' => '#8b5cf6',
-        'bpmn'         => '#f59e0b',
+        'sop'      => '#3b82f6',
+        'job_desk' => '#10b981',
+        'bpm'      => '#f59e0b',
+        'struktur' => '#8b5cf6',
     ];
+
+    // Type icons
+    public static array $typeIcons = [
+        'sop'      => 'fa-file-contract',
+        'job_desk' => 'fa-user-gear',
+        'bpm'      => 'fa-diagram-project',
+        'struktur' => 'fa-sitemap',
+    ];
+
+    public function bod()
+    {
+        return $this->belongsTo(Bod::class);
+    }
 
     public function division()
     {

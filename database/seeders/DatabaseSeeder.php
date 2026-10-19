@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Bod;
 use App\Models\Division;
 use App\Models\Position;
 use App\Models\User;
@@ -12,83 +13,105 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // --- Users -----------------------------------------------
-        $ketua = User::create([
-            'name'     => 'Ketua HRD',
-            'email'    => 'ketua@sukhati.com',
-            'password' => Hash::make('password'),
-            'role'     => 'ketua',
+        // --- Users ---------------------------------------------------
+        User::create([
+            'name'      => 'Super Admin',
+            'username'  => 'superadmin',
+            'email'     => 'superadmin@sukhati.com',
+            'password'  => Hash::make('password'),
+            'role'      => 'super_admin',
+            'jabatan'   => 'Super Administrator',
+            'is_active' => true,
         ]);
 
         User::create([
-            'name'     => 'User Umum',
-            'email'    => 'user@sukhati.com',
-            'password' => Hash::make('password'),
-            'role'     => 'user_umum',
+            'name'      => 'Admin HRD',
+            'username'  => 'admin',
+            'email'     => 'admin@sukhati.com',
+            'password'  => Hash::make('password'),
+            'role'      => 'admin',
+            'jabatan'   => 'Administrator HRD',
+            'is_active' => true,
         ]);
 
-        // --- Divisions & Positions --------------------------------
-        $divisions = [
-            ['name' => 'HRD', 'color' => '#3b82f6', 'order' => 1, 'positions' => [
-                ['name' => 'HR Manager', 'level' => 0, 'order' => 1],
-                ['name' => 'Staff HRD', 'level' => 1, 'order' => 2],
-                ['name' => 'Recruitment Staff', 'level' => 1, 'order' => 3],
-            ]],
-            ['name' => 'Keuangan', 'color' => '#10b981', 'order' => 2, 'positions' => [
-                ['name' => 'Finance Manager', 'level' => 0, 'order' => 1],
-                ['name' => 'Staff Finance', 'level' => 1, 'order' => 2],
-                ['name' => 'Staff Akuntansi', 'level' => 1, 'order' => 3],
-            ]],
-            ['name' => 'Produksi', 'color' => '#f59e0b', 'order' => 3, 'positions' => [
-                ['name' => 'Manager Produksi', 'level' => 0, 'order' => 1],
-                ['name' => 'Supervisor Produksi', 'level' => 1, 'order' => 2],
-                ['name' => 'Staff Produksi', 'level' => 1, 'order' => 3],
-            ]],
-            ['name' => 'Marketing', 'color' => '#ef4444', 'order' => 4, 'positions' => [
-                ['name' => 'Marketing Manager', 'level' => 0, 'order' => 1],
-                ['name' => 'Staff Marketing', 'level' => 1, 'order' => 2],
-            ]],
-            ['name' => 'IT', 'color' => '#8b5cf6', 'order' => 5, 'positions' => [
-                ['name' => 'IT Manager', 'level' => 0, 'order' => 1],
-                ['name' => 'Staff IT', 'level' => 1, 'order' => 2],
-                ['name' => 'Developer', 'level' => 1, 'order' => 3],
-            ]],
+        User::create([
+            'name'      => 'Anggota Umum',
+            'username'  => 'anggota',
+            'email'     => 'anggota@sukhati.com',
+            'password'  => Hash::make('password'),
+            'role'      => 'anggota',
+            'jabatan'   => 'Staff Umum',
+            'is_active' => true,
+        ]);
+
+        // --- BODs ---------------------------------------------------
+        $bodA = Bod::create([
+            'name'        => 'BOD A',
+            'description' => 'Direksi A - Operasional & SDM',
+            'color'       => '#3b82f6',
+            'order'       => 1,
+        ]);
+
+        $bodB = Bod::create([
+            'name'        => 'BOD B',
+            'description' => 'Direksi B - Keuangan & Produksi',
+            'color'       => '#10b981',
+            'order'       => 2,
+        ]);
+
+        // --- Departments (Divisions) under BOD A -------------------
+        $divData = [
+            [
+                'bod_id' => $bodA->id, 'name' => 'HRD',
+                'color' => '#3b82f6', 'order' => 1,
+                'description' => 'Departemen Human Resource Development',
+                'positions' => ['HR Manager', 'Staff HRD', 'Recruitment Staff'],
+            ],
+            [
+                'bod_id' => $bodA->id, 'name' => 'Marketing',
+                'color' => '#ef4444', 'order' => 2,
+                'description' => 'Departemen Marketing & Pemasaran',
+                'positions' => ['Marketing Manager', 'Staff Marketing'],
+            ],
         ];
 
-        foreach ($divisions as $divData) {
-            $positions = $divData['positions'];
-            unset($divData['positions']);
-            $divData['description'] = 'Divisi ' . $divData['name'];
+        // --- Departments under BOD B ---
+        $divData[] = [
+            'bod_id' => $bodB->id, 'name' => 'Keuangan',
+            'color' => '#10b981', 'order' => 3,
+            'description' => 'Departemen Keuangan & Akuntansi',
+            'positions' => ['Finance Manager', 'Staff Finance', 'Staff Akuntansi'],
+        ];
 
-            $division = Division::create($divData);
+        $divData[] = [
+            'bod_id' => $bodB->id, 'name' => 'Produksi',
+            'color' => '#f59e0b', 'order' => 4,
+            'description' => 'Departemen Produksi & Operasional',
+            'positions' => ['Manager Produksi', 'Supervisor Produksi', 'Staff Produksi'],
+        ];
 
-            // Create root positions first
-            $rootPositions = [];
-            foreach ($positions as $pos) {
-                if ($pos['level'] === 0) {
-                    $created = Position::create([
-                        'division_id' => $division->id,
-                        'name'        => $pos['name'],
-                        'level'       => 0,
-                        'order'       => $pos['order'],
-                        'parent_id'   => null,
-                    ]);
-                    $rootPositions[] = $created;
-                }
-            }
+        $divData[] = [
+            'bod_id' => $bodB->id, 'name' => 'IT',
+            'color' => '#8b5cf6', 'order' => 5,
+            'description' => 'Departemen Teknologi Informasi',
+            'positions' => ['IT Manager', 'Staff IT', 'Developer'],
+        ];
 
-            // Create sub positions
-            $parentId = count($rootPositions) > 0 ? $rootPositions[0]->id : null;
-            foreach ($positions as $pos) {
-                if ($pos['level'] > 0) {
-                    Position::create([
-                        'division_id' => $division->id,
-                        'name'        => $pos['name'],
-                        'level'       => $pos['level'],
-                        'order'       => $pos['order'],
-                        'parent_id'   => $parentId,
-                    ]);
-                }
+        foreach ($divData as $data) {
+            $positions = $data['positions'];
+            unset($data['positions']);
+
+            $division = Division::create($data);
+
+            $order = 1;
+            foreach ($positions as $posName) {
+                Position::create([
+                    'division_id' => $division->id,
+                    'name'        => $posName,
+                    'level'       => 0,
+                    'order'       => $order++,
+                    'parent_id'   => null,
+                ]);
             }
         }
     }

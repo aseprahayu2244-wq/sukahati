@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="headerTitle">Dashboard  admin</x-slot>
+    <x-slot name="headerTitle">Dashboard</x-slot>
     <x-slot name="breadcrumb">
         <span>Beranda</span>
         <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
@@ -11,25 +11,31 @@
         <div class="absolute right-0 top-0 bottom-0 opacity-10 flex items-center pr-12 pointer-events-none">
             <i class="fa-solid fa-folder-tree text-9xl"></i>
         </div>
-        <div class="relative z-10 max-w-2xl">
-            <div class="inline-flex items-center space-x-2 bg-blue-500/20 text-blue-300 border border-blue-500/30 text-xs px-3 py-1 rounded-full font-semibold mb-4 backdrop-blur-md">
+        <div class="relative z-10 max-w-3xl">
+            <div class="inline-flex items-center space-x-2 bg-blue-500/20 text-blue-300 border border-blue-500/30 text-xs px-3.5 py-1.5 rounded-full font-semibold mb-4 backdrop-blur-md">
                 <i class="fa-solid fa-shield-halved text-amber-400"></i>
-                <span>Status Hak Akses: {{ auth()->user()->isKetua() ? 'Ketua (Full CRUD)' : 'User Umum (View Only)' }}</span>
+                <span>Role: {{ auth()->user()->getRoleLabel() }} &bull; {{ auth()->user()->isSuperAdmin() ? 'Akses Penuh Sistem' : (auth()->user()->isAdmin() ? 'Pengelola Dokumen & Departemen' : 'Akses Dokumen (View & Download)') }}</span>
             </div>
             <h1 class="text-3xl font-extrabold tracking-tight text-white mb-2">Selamat Datang, {{ auth()->user()->name }}! 👋</h1>
             <p class="text-slate-300 text-sm leading-relaxed">
-                Sistem Informasi Manajemen Dokumen HRD memudahkan pengelolaan dokumen SOP, Job Description, Job Analysis, BPMN, dan Struktur Organisasi dengan terstruktur berbasis hirarki Divisi & Jabatan.
+                Sistem Informasi Manajemen Dokumen HRD memudahkan pengelolaan dokumen SOP, Job Desk, BPM, dan Struktur Organisasi dengan terstruktur berbasis hirarki BOD, Departemen, dan Jabatan.
             </p>
-            @if(auth()->user()->isKetua())
+            @if(auth()->user()->canManageDocuments())
                 <div class="mt-6 flex flex-wrap items-center gap-3">
                     <a href="{{ route('documents.create') }}" class="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg shadow-blue-500/30 transition-all-200">
                         <i class="fa-solid fa-cloud-arrow-up"></i>
                         <span>Upload Dokumen Baru</span>
                     </a>
-                    <a href="{{ route('admin.divisions.index') }}" class="inline-flex items-center space-x-2 bg-white/10 hover:bg-white/20 text-white font-semibold text-xs px-4 py-2.5 rounded-xl backdrop-blur-md transition-all-200">
-                        <i class="fa-solid fa-layer-group"></i>
-                        <span>Kelola Divisi</span>
-                    </a>
+                    @if(auth()->user()->isSuperAdmin())
+                        <a href="{{ route('admin.bods.index') }}" class="inline-flex items-center space-x-2 bg-white/10 hover:bg-white/20 text-white font-semibold text-xs px-4 py-2.5 rounded-xl backdrop-blur-md transition-all-200">
+                            <i class="fa-solid fa-building-user"></i>
+                            <span>Kelola BOD</span>
+                        </a>
+                        <a href="{{ route('admin.users.index') }}" class="inline-flex items-center space-x-2 bg-white/10 hover:bg-white/20 text-white font-semibold text-xs px-4 py-2.5 rounded-xl backdrop-blur-md transition-all-200">
+                            <i class="fa-solid fa-users-gear"></i>
+                            <span>Kelola Pengguna</span>
+                        </a>
+                    @endif
                 </div>
             @endif
         </div>
@@ -38,60 +44,73 @@
     <!-- Stats Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
         
-        <!-- Stats 1: Divisi -->
+        <!-- Stats 1: BOD -->
         <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex items-center justify-between transition-all-200 hover:shadow-md">
             <div>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Divisi</p>
-                <h3 class="text-2xl font-extrabold text-slate-800 mt-1">{{ $totalDivisions ?? 0 }}</h3>
-                <p class="text-xs text-slate-500 mt-1">Divisi aktif terdaftar</p>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total BOD</p>
+                <h3 class="text-2xl font-extrabold text-slate-800 mt-1">{{ $totalBods ?? 0 }}</h3>
+                <p class="text-xs text-slate-500 mt-1">Board of Directors</p>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl shadow-inner">
+                <i class="fa-solid fa-building-user"></i>
+            </div>
+        </div>
+
+        <!-- Stats 2: Departemen -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex items-center justify-between transition-all-200 hover:shadow-md">
+            <div>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Departemen</p>
+                <h3 class="text-2xl font-extrabold text-slate-800 mt-1">{{ $totalDepartments ?? 0 }}</h3>
+                <p class="text-xs text-slate-500 mt-1">Departemen aktif</p>
             </div>
             <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl shadow-inner">
                 <i class="fa-solid fa-layer-group"></i>
             </div>
         </div>
 
-        <!-- Stats 2: Jabatan -->
+        <!-- Stats 3: Jabatan -->
         <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex items-center justify-between transition-all-200 hover:shadow-md">
             <div>
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Jabatan</p>
                 <h3 class="text-2xl font-extrabold text-slate-800 mt-1">{{ $totalPositions ?? 0 }}</h3>
-                <p class="text-xs text-slate-500 mt-1">Jabatan di organisasi</p>
+                <p class="text-xs text-slate-500 mt-1">Jabatan dalam organisasi</p>
             </div>
-            <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl shadow-inner">
+            <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl shadow-inner">
                 <i class="fa-solid fa-id-badge"></i>
             </div>
         </div>
 
-        <!-- Stats 3: Dokumen -->
-        <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex items-center justify-between transition-all-200 hover:shadow-md">
-            <div>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Dokumen</p>
-                <h3 class="text-2xl font-extrabold text-slate-800 mt-1">{{ array_sum($docStats ?? []) }}</h3>
-                <p class="text-xs text-slate-500 mt-1">Dokumen tersimpan</p>
+        <!-- Stats 4: Dokumen / User -->
+        @if(auth()->user()->isSuperAdmin() && isset($totalUsers))
+            <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex items-center justify-between transition-all-200 hover:shadow-md">
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Pengguna</p>
+                    <h3 class="text-2xl font-extrabold text-slate-800 mt-1">{{ $totalUsers }}</h3>
+                    <a href="{{ route('admin.users.index') }}" class="text-xs text-purple-600 hover:underline font-semibold mt-1 inline-block">Kelola Akun &rarr;</a>
+                </div>
+                <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl shadow-inner">
+                    <i class="fa-solid fa-users"></i>
+                </div>
             </div>
-            <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl shadow-inner">
-                <i class="fa-solid fa-folder-open"></i>
+        @else
+            <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex items-center justify-between transition-all-200 hover:shadow-md">
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Dokumen</p>
+                    <h3 class="text-2xl font-extrabold text-slate-800 mt-1">{{ $totalDocuments ?? 0 }}</h3>
+                    <p class="text-xs text-slate-500 mt-1">Dokumen tersimpan</p>
+                </div>
+                <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl shadow-inner">
+                    <i class="fa-solid fa-folder-open"></i>
+                </div>
             </div>
-        </div>
-
-        <!-- Stats 4: Struktur Org -->
-        <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex items-center justify-between transition-all-200 hover:shadow-md">
-            <div>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Struktur Organisasi</p>
-                <h3 class="text-lg font-extrabold text-slate-800 mt-1">BPMN & Chart</h3>
-                <a href="{{ route('organization.index') }}" class="text-xs text-blue-600 hover:underline font-semibold mt-1 inline-block">Lihat Diagram &rarr;</a>
-            </div>
-            <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl shadow-inner">
-                <i class="fa-solid fa-sitemap"></i>
-            </div>
-        </div>
+        @endif
 
     </div>
 
-    <!-- Document Category Cards (Google Drive concept shortcuts) -->
+    <!-- Document Category Cards -->
     <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center space-x-2">
         <i class="fa-solid fa-cubes text-blue-600"></i>
-        <span>Kategori Dokumen Utama</span>
+        <span>Menu Utama Dokumen</span>
     </h3>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
         
@@ -105,64 +124,64 @@
                     {{ $docStats['sop'] ?? 0 }} File
                 </span>
             </div>
-            <h4 class="font-bold text-slate-900 text-base group-hover:text-emerald-600 transition-all-200">Standard Operating Procedure</h4>
-            <p class="text-xs text-slate-500 mt-1">Dokumen SOP standar operasional perusahaan</p>
+            <h4 class="font-bold text-slate-900 text-base group-hover:text-emerald-600 transition-all-200">SOP</h4>
+            <p class="text-xs text-slate-500 mt-1">Standard Operating Procedure</p>
             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-emerald-600">
                 <span>Buka Folder SOP</span>
                 <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-all-200"></i>
             </div>
         </a>
 
-        <!-- Job Description Card -->
-        <a href="{{ route('documents.index', 'job') }}" class="folder-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm transition-all-200 group relative overflow-hidden">
+        <!-- Job Desk Card -->
+        <a href="{{ route('documents.index', 'job_desk') }}" class="folder-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm transition-all-200 group relative overflow-hidden">
             <div class="flex items-center justify-between mb-4">
                 <div class="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center text-xl shadow-md shadow-amber-500/20 group-hover:scale-110 transition-all-200">
                     <i class="fa-solid fa-user-gear"></i>
                 </div>
                 <span class="bg-amber-50 text-amber-700 text-xs font-bold px-3 py-1 rounded-full border border-amber-200">
-                    {{ $docStats['job'] ?? 0 }} File
+                    {{ $docStats['job_desk'] ?? 0 }} File
                 </span>
             </div>
-            <h4 class="font-bold text-slate-900 text-base group-hover:text-amber-600 transition-all-200">Job Description</h4>
-            <p class="text-xs text-slate-500 mt-1">Rincian tugas dan tanggung jawab jabatan</p>
+            <h4 class="font-bold text-slate-900 text-base group-hover:text-amber-600 transition-all-200">Job Desk</h4>
+            <p class="text-xs text-slate-500 mt-1">Uraian tugas per jabatan</p>
             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-amber-600">
-                <span>Buka Folder Job</span>
+                <span>Buka Folder Job Desk</span>
                 <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-all-200"></i>
             </div>
         </a>
 
-        <!-- Job Analysis Card -->
-        <a href="{{ route('documents.index', 'job_analysis') }}" class="folder-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm transition-all-200 group relative overflow-hidden">
+        <!-- BPM Card -->
+        <a href="{{ route('documents.index', 'bpm') }}" class="folder-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm transition-all-200 group relative overflow-hidden">
             <div class="flex items-center justify-between mb-4">
                 <div class="w-12 h-12 rounded-2xl bg-purple-500 text-white flex items-center justify-center text-xl shadow-md shadow-purple-500/20 group-hover:scale-110 transition-all-200">
-                    <i class="fa-solid fa-magnifying-glass-chart"></i>
+                    <i class="fa-solid fa-diagram-project"></i>
                 </div>
                 <span class="bg-purple-50 text-purple-700 text-xs font-bold px-3 py-1 rounded-full border border-purple-200">
-                    {{ $docStats['job_analysis'] ?? 0 }} File
+                    {{ $docStats['bpm'] ?? 0 }} File
                 </span>
             </div>
-            <h4 class="font-bold text-slate-900 text-base group-hover:text-purple-600 transition-all-200">Job Analysis</h4>
-            <p class="text-xs text-slate-500 mt-1">Analisis kebutuhan dan spesifikasi jabatan</p>
+            <h4 class="font-bold text-slate-900 text-base group-hover:text-purple-600 transition-all-200">BPM</h4>
+            <p class="text-xs text-slate-500 mt-1">Business Process Management</p>
             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-purple-600">
-                <span>Buka Folder JA</span>
+                <span>Buka Folder BPM</span>
                 <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-all-200"></i>
             </div>
         </a>
 
-        <!-- BPMN Card -->
-        <a href="{{ route('documents.index', 'bpmn') }}" class="folder-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm transition-all-200 group relative overflow-hidden">
+        <!-- Struktur Organisasi Card -->
+        <a href="{{ route('documents.index', 'struktur') }}" class="folder-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm transition-all-200 group relative overflow-hidden">
             <div class="flex items-center justify-between mb-4">
                 <div class="w-12 h-12 rounded-2xl bg-rose-500 text-white flex items-center justify-center text-xl shadow-md shadow-rose-500/20 group-hover:scale-110 transition-all-200">
-                    <i class="fa-solid fa-diagram-project"></i>
+                    <i class="fa-solid fa-sitemap"></i>
                 </div>
                 <span class="bg-rose-50 text-rose-700 text-xs font-bold px-3 py-1 rounded-full border border-rose-200">
-                    {{ $docStats['bpmn'] ?? 0 }} File
+                    {{ $docStats['struktur'] ?? 0 }} File
                 </span>
             </div>
-            <h4 class="font-bold text-slate-900 text-base group-hover:text-rose-600 transition-all-200">BPMN Diagram</h4>
-            <p class="text-xs text-slate-500 mt-1">Business Process Model and Notation</p>
+            <h4 class="font-bold text-slate-900 text-base group-hover:text-rose-600 transition-all-200">Struktur Organisasi</h4>
+            <p class="text-xs text-slate-500 mt-1">Bagan organisasi departemen</p>
             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-rose-600">
-                <span>Buka Folder BPMN</span>
+                <span>Buka Folder Struktur</span>
                 <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-all-200"></i>
             </div>
         </a>
@@ -179,7 +198,7 @@
                 </h3>
                 <p class="text-xs text-slate-500 mt-0.5">Daftar file HRD terbaru yang diunggah ke sistem</p>
             </div>
-            <a href="{{ route('documents.index', 'sop') }}" class="text-xs font-bold text-blue-600 hover:text-blue-800">Lihat Semua Dokumen &rarr;</a>
+            <a href="{{ route('documents.index', 'sop') }}" class="text-xs font-bold text-blue-600 hover:text-blue-800">Lihat Folder Dokumen &rarr;</a>
         </div>
 
         @if(isset($recentDocuments) && $recentDocuments->count() > 0)
@@ -189,7 +208,7 @@
                         <tr>
                             <th class="py-3.5 px-4">Nama Dokumen</th>
                             <th class="py-3.5 px-4">Kategori</th>
-                            <th class="py-3.5 px-4">Divisi & Jabatan</th>
+                            <th class="py-3.5 px-4">BOD & Departemen</th>
                             <th class="py-3.5 px-4">Pengunggah</th>
                             <th class="py-3.5 px-4 text-center">Aksi</th>
                         </tr>
@@ -210,13 +229,16 @@
                                 </td>
                                 <td class="py-4 px-4">
                                     <span class="text-xs font-bold px-2.5 py-1 rounded-full uppercase
-                                        {{ $doc->type === 'sop' ? 'bg-emerald-100 text-emerald-700' : ($doc->type === 'job' ? 'bg-amber-100 text-amber-700' : ($doc->type === 'job_analysis' ? 'bg-purple-100 text-purple-700' : 'bg-rose-100 text-rose-700')) }}">
-                                        {{ strtoupper(str_replace('_', ' ', $doc->type)) }}
+                                        {{ $doc->type === 'sop' ? 'bg-emerald-100 text-emerald-700' : ($doc->type === 'job_desk' ? 'bg-amber-100 text-amber-700' : ($doc->type === 'bpm' ? 'bg-purple-100 text-purple-700' : 'bg-rose-100 text-rose-700')) }}">
+                                        {{ $doc->type === 'job_desk' ? 'JOB DESK' : ($doc->type === 'struktur' ? 'STRUKTUR' : strtoupper($doc->type)) }}
                                     </span>
                                 </td>
                                 <td class="py-4 px-4 text-xs">
                                     <p class="font-semibold text-slate-800">{{ $doc->division->name ?? '-' }}</p>
-                                    <p class="text-slate-500">{{ $doc->position->name ?? '-' }}</p>
+                                    <p class="text-slate-400 text-[11px]">
+                                        BOD: {{ $doc->bod->name ?? '-' }}
+                                        @if($doc->position) &bull; {{ $doc->position->name }} @endif
+                                    </p>
                                 </td>
                                 <td class="py-4 px-4 text-xs">
                                     <p class="font-medium text-slate-700">{{ $doc->uploader->name ?? 'System' }}</p>

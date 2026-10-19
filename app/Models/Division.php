@@ -9,7 +9,13 @@ class Division extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'color', 'order'];
+    // Division acts as Department in the new system
+    protected $fillable = ['bod_id', 'name', 'description', 'color', 'order'];
+
+    public function bod()
+    {
+        return $this->belongsTo(Bod::class);
+    }
 
     public function positions()
     {
