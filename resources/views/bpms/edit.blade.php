@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="headerTitle">Revisi & Edit Dokumen BPM</x-slot>
     <x-slot name="breadcrumb">
         <a href="{{ route('dashboard') }}" class="hover:underline">Beranda</a>
@@ -193,17 +193,17 @@
                 </div>
 
                 <!-- Builder Interactive Table -->
-                <div class="overflow-x-auto border border-slate-200 rounded-2xl mb-5 shadow-inner">
-                    <table class="w-full text-left text-xs text-slate-700 min-w-[900px]">
-                        <thead class="bg-slate-100/80 text-slate-700 font-extrabold uppercase text-[10px] tracking-wider border-b border-slate-200">
+                <div class="border border-slate-200 rounded-2xl mb-5 shadow-sm overflow-hidden bg-white">
+                    <table class="w-full text-left text-xs text-slate-700 table-fixed">
+                        <thead class="bg-slate-100/90 text-slate-700 font-extrabold uppercase text-[10px] tracking-wider border-b border-slate-200">
                             <tr>
-                                <th class="py-3 px-3 w-12 text-center">Urutan</th>
-                                <th class="py-3 px-4 min-w-[280px]">Level & Uraian Aktivitas <span class="text-rose-500">*</span></th>
-                                <th class="py-3 px-3 w-48 text-indigo-700">Responsible (R)</th>
-                                <th class="py-3 px-3 w-44 text-amber-700">Accountable (A)</th>
-                                <th class="py-3 px-3 w-44 text-sky-700">Consulted (C)</th>
-                                <th class="py-3 px-3 w-44 text-emerald-700">Informed (I)</th>
-                                <th class="py-3 px-3 w-16 text-center">Aksi</th>
+                                <th class="py-3.5 px-2 w-10 text-center"></th>
+                                <th class="py-3.5 px-4 min-w-[340px] text-slate-900">Level & Uraian Aktivitas <span class="text-rose-500">*</span></th>
+                                <th class="py-3.5 px-2 w-48 text-indigo-700 font-bold">Responsible (R)</th>
+                                <th class="py-3.5 px-2 w-44 text-amber-700 font-bold">Accountable (A)</th>
+                                <th class="py-3.5 px-2 w-44 text-sky-700 font-bold">Consulted (C)</th>
+                                <th class="py-3.5 px-2 w-44 text-emerald-700 font-bold">Informed (I)</th>
+                                <th class="py-3.5 px-2 w-12 text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="builderTableBody" class="divide-y divide-slate-100 bg-white">
@@ -338,18 +338,18 @@
             const tbody = document.getElementById('builderTableBody');
             if (!tbody) return;
             const emptyState = document.getElementById('builderEmptyState');
-            emptyState.classList.add('hidden');
+            if (emptyState) emptyState.classList.add('hidden');
 
             const id = 'step_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
             const currentIndex = stepIndex++;
 
-            const indentClass = level === 'L1' ? 'pl-2' : (level === 'L2' ? 'pl-8' : 'pl-14');
+            const indentClass = level === 'L1' ? 'pl-2' : (level === 'L2' ? 'pl-6' : 'pl-10');
             const badgeClass = level === 'L1' 
-                ? 'bg-indigo-100 text-indigo-800 border-indigo-200' 
-                : (level === 'L2' ? 'bg-sky-100 text-sky-800 border-sky-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200');
+                ? 'bg-indigo-600 text-white border-indigo-700 shadow-sm' 
+                : (level === 'L2' ? 'bg-sky-600 text-white border-sky-700 shadow-sm' : 'bg-emerald-600 text-white border-emerald-700 shadow-sm');
             const placeholder = level === 'L1' 
-                ? 'Masukkan nama proses utama' 
-                : (level === 'L2' ? 'Masukkan nama subproses' : 'Masukkan rincian aktivitas');
+                ? 'Level 1: Masukkan nama bab / proses utama...' 
+                : (level === 'L2' ? 'Level 2: Masukkan nama subbab / subproses...' : 'Level 3: Masukkan rincian aktivitas / tahapan detail...');
 
             const arrowIcon = level === 'L2' ? '↳ ' : (level === 'L3' ? '↳ ↳ ' : '');
 
@@ -382,51 +382,54 @@
             row.dataset.level = level;
 
             row.innerHTML = `
-                <td class="py-3 px-3 text-center cursor-move text-slate-400 hover:text-slate-700 drag-handle" title="Tahan & geser untuk mengubah urutan">
-                    <i class="fa-solid fa-grip-vertical"></i>
+                <td class="py-3.5 px-2 text-center cursor-move text-slate-400 hover:text-slate-700 drag-handle" title="Tahan & geser untuk mengubah urutan">
+                    <i class="fa-solid fa-grip-vertical text-sm"></i>
                 </td>
-                <td class="py-3 px-4 ${indentClass}">
-                    <div class="flex items-center space-x-2">
-                        <span class="shrink-0 text-slate-400 text-xs font-mono">${arrowIcon}</span>
-                        <span class="shrink-0 text-[10px] font-extrabold px-2 py-0.5 rounded border ${badgeClass}">
+                <td class="py-3.5 px-3 ${indentClass}">
+                    <div class="flex items-center space-x-2.5 w-full">
+                        <span class="shrink-0 text-slate-400 text-xs font-mono select-none">${arrowIcon}</span>
+                        <span class="shrink-0 text-[11px] font-black px-2.5 py-1 rounded-md border tracking-wider ${badgeClass}">
                             ${level}
                         </span>
                         <input type="hidden" name="steps[${currentIndex}][level]" value="${level}">
-                        <input type="text" name="steps[${currentIndex}][activity_description]" 
-                               value="${initialData.activity_description ? initialData.activity_description.replace(/"/g, '&quot;') : ''}" 
-                               placeholder="${placeholder}" 
-                               required 
-                               class="w-full bg-slate-50 text-slate-900 text-xs font-medium rounded-lg px-3 py-2 border border-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                        <div class="flex-1 w-full">
+                            <input type="text" name="steps[${currentIndex}][activity_description]" 
+                                   value="${initialData.activity_description ? initialData.activity_description.replace(/"/g, '&quot;') : ''}" 
+                                   placeholder="${placeholder}" 
+                                   required 
+                                   class="w-full bg-slate-50 text-slate-900 text-xs sm:text-sm font-semibold rounded-xl px-4 py-3 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all">
+                        </div>
                     </div>
                 </td>
-                <td class="py-3 px-3">
-                    <select name="steps[${currentIndex}][raci_r][]" multiple size="2" class="w-full bg-slate-50 text-slate-800 text-[11px] rounded-lg px-2 py-1 border border-indigo-200 focus:outline-none focus:ring-1 focus:ring-indigo-500" title="Tekan Ctrl/Cmd untuk memilih beberapa jabatan">
+                <td class="py-3.5 px-2">
+                    <select name="steps[${currentIndex}][raci_r][]" multiple size="2" class="w-full bg-slate-50 text-slate-800 text-[11px] rounded-lg px-2 py-1.5 border border-indigo-200 focus:outline-none focus:ring-1 focus:ring-indigo-500" title="Tekan Ctrl/Cmd untuk memilih beberapa jabatan">
                         ${posOptionsR}
                     </select>
                 </td>
-                <td class="py-3 px-3">
-                    <select name="steps[${currentIndex}][raci_a]" class="w-full bg-slate-50 text-slate-800 text-[11px] rounded-lg px-2 py-1 border border-amber-200 focus:outline-none focus:ring-1 focus:ring-amber-500">
+                <td class="py-3.5 px-2">
+                    <select name="steps[${currentIndex}][raci_a]" class="w-full bg-slate-50 text-slate-800 text-[11px] rounded-lg px-2 py-1.5 border border-amber-200 focus:outline-none focus:ring-1 focus:ring-amber-500">
                         ${posOptionsA}
                     </select>
                 </td>
-                <td class="py-3 px-3">
-                    <select name="steps[${currentIndex}][raci_c][]" multiple size="2" class="w-full bg-slate-50 text-slate-800 text-[11px] rounded-lg px-2 py-1 border border-sky-200 focus:outline-none focus:ring-1 focus:ring-sky-500" title="Tekan Ctrl/Cmd untuk memilih beberapa jabatan">
+                <td class="py-3.5 px-2">
+                    <select name="steps[${currentIndex}][raci_c][]" multiple size="2" class="w-full bg-slate-50 text-slate-800 text-[11px] rounded-lg px-2 py-1.5 border border-sky-200 focus:outline-none focus:ring-1 focus:ring-sky-500" title="Tekan Ctrl/Cmd untuk memilih beberapa jabatan">
                         ${posOptionsC}
                     </select>
                 </td>
-                <td class="py-3 px-3">
-                    <select name="steps[${currentIndex}][raci_i][]" multiple size="2" class="w-full bg-slate-50 text-slate-800 text-[11px] rounded-lg px-2 py-1 border border-emerald-200 focus:outline-none focus:ring-1 focus:ring-emerald-500" title="Tekan Ctrl/Cmd untuk memilih beberapa jabatan">
+                <td class="py-3.5 px-2">
+                    <select name="steps[${currentIndex}][raci_i][]" multiple size="2" class="w-full bg-slate-50 text-slate-800 text-[11px] rounded-lg px-2 py-1.5 border border-emerald-200 focus:outline-none focus:ring-1 focus:ring-emerald-500" title="Tekan Ctrl/Cmd untuk memilih beberapa jabatan">
                         ${posOptionsI}
                     </select>
                 </td>
-                <td class="py-3 px-3 text-center">
-                    <button type="button" onclick="removeStepRow('${id}')" title="Hapus Baris" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg transition-colors">
-                        <i class="fa-solid fa-trash-can text-xs"></i>
+                <td class="py-3.5 px-2 text-center">
+                    <button type="button" onclick="removeStepRow('${id}')" title="Hapus Baris" class="p-2 text-slate-400 hover:text-rose-600 rounded-lg transition-colors">
+                        <i class="fa-solid fa-trash-can text-sm"></i>
                     </button>
                 </td>
             `;
 
             tbody.appendChild(row);
+            attachDragAndDrop(row);
             attachDragAndDrop(row);
         }
 
