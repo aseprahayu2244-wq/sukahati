@@ -192,35 +192,19 @@
                     </div>
                 </div>
 
-                <!-- Builder Interactive Table -->
-                <div class="border border-slate-200 rounded-2xl mb-5 shadow-sm overflow-hidden bg-white">
-                    <table class="w-full text-left text-xs text-slate-700 table-fixed">
-                        <thead class="bg-slate-100/90 text-slate-700 font-extrabold uppercase text-[10px] tracking-wider border-b border-slate-200">
-                            <tr>
-                                <th class="py-3.5 px-2 w-10 text-center"></th>
-                                <th class="py-3.5 px-4 min-w-[340px] text-slate-900">Level & Uraian Aktivitas <span class="text-rose-500">*</span></th>
-                                <th class="py-3.5 px-2 w-48 text-indigo-700 font-bold">Responsible (R)</th>
-                                <th class="py-3.5 px-2 w-44 text-amber-700 font-bold">Accountable (A)</th>
-                                <th class="py-3.5 px-2 w-44 text-sky-700 font-bold">Consulted (C)</th>
-                                <th class="py-3.5 px-2 w-44 text-emerald-700 font-bold">Informed (I)</th>
-                                <th class="py-3.5 px-2 w-12 text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="builderTableBody" class="divide-y divide-slate-100 bg-white">
-                            <!-- Prepopulated with existing steps -->
-                        </tbody>
-                    </table>
+                <!-- Builder Interactive Stack (Full-Width Card Layout) -->
+                <div id="builderCardsContainer" class="space-y-4 mb-6">
+                    <!-- Step Cards dynamically rendered via JavaScript -->
                 </div>
 
                 <!-- Empty State Container if no rows -->
-                <div id="builderEmptyState" class="hidden p-8 text-center bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl mb-5">
-                    <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-500 flex items-center justify-center mx-auto text-xl mb-3">
+                <div id="builderEmptyState" class="hidden p-10 text-center bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl mb-6">
+                    <div class="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-500 flex items-center justify-center mx-auto text-2xl mb-3 shadow-inner">
                         <i class="fa-solid fa-list-check"></i>
                     </div>
-                    <h4 class="font-bold text-slate-800 text-sm">Belum Ada Tahapan Proses</h4>
-                    <p class="text-xs text-slate-500 mt-1 max-w-md mx-auto">Gunakan tombol di bawah untuk menambahkan baris tahapan proses.</p>
+                    <h4 class="font-extrabold text-slate-800 text-base">Belum Ada Tahapan Proses Bisnis</h4>
+                    <p class="text-xs text-slate-500 mt-1 max-w-md mx-auto">Klik tombol tambah level di bawah untuk menambahkan baris tahapan proses.</p>
                 </div>
-
                 <!-- Add Buttons Toolbar -->
                 <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
                     <div class="flex items-center space-x-2">
@@ -335,21 +319,25 @@
         let stepIndex = 0;
 
         function addStepRow(level, initialData = {}) {
-            const tbody = document.getElementById('builderTableBody');
-            if (!tbody) return;
+            const container = document.getElementById('builderCardsContainer');
+            if (!container) return;
             const emptyState = document.getElementById('builderEmptyState');
             if (emptyState) emptyState.classList.add('hidden');
 
             const id = 'step_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
             const currentIndex = stepIndex++;
 
-            const indentClass = level === 'L1' ? 'pl-2' : (level === 'L2' ? 'pl-6' : 'pl-10');
+            const indentClass = level === 'L1' ? '' : (level === 'L2' ? 'ml-6 sm:ml-10' : 'ml-12 sm:ml-20');
+            const borderAccent = level === 'L1' 
+                ? 'border-l-4 border-l-indigo-600 border-indigo-200/80 bg-white' 
+                : (level === 'L2' ? 'border-l-4 border-l-sky-500 border-sky-200/80 bg-white' : 'border-l-4 border-l-emerald-500 border-emerald-200/80 bg-white');
             const badgeClass = level === 'L1' 
-                ? 'bg-indigo-600 text-white border-indigo-700 shadow-sm' 
-                : (level === 'L2' ? 'bg-sky-600 text-white border-sky-700 shadow-sm' : 'bg-emerald-600 text-white border-emerald-700 shadow-sm');
+                ? 'bg-indigo-600 text-white' 
+                : (level === 'L2' ? 'bg-sky-600 text-white' : 'bg-emerald-600 text-white');
+            const levelLabel = level === 'L1' ? 'Level 1 &bull; Proses Utama' : (level === 'L2' ? 'Level 2 &bull; Subproses' : 'Level 3 &bull; Aktivitas Rinci');
             const placeholder = level === 'L1' 
-                ? 'Level 1: Masukkan nama bab / proses utama...' 
-                : (level === 'L2' ? 'Level 2: Masukkan nama subbab / subproses...' : 'Level 3: Masukkan rincian aktivitas / tahapan detail...');
+                ? 'Masukkan nama bab / proses bisnis utama (Contoh: Proses Rekrutmen Karyawan, Pengadaan Bahan Baku)...' 
+                : (level === 'L2' ? 'Masukkan nama subbab / subproses (Contoh: Seleksi Administrasi, Penerimaan Berkas)...' : 'Masukkan rincian aktivitas terperinci (Contoh: Melakukan verifikasi keabsahan dokumen lamaran)...');
 
             const arrowIcon = level === 'L2' ? '↳ ' : (level === 'L3' ? '↳ ↳ ' : '');
 
@@ -375,62 +363,185 @@
                 posOptionsI += `<option value="${p.id}" ${isI}>${p.name}</option>`;
             });
 
-            const row = document.createElement('tr');
-            row.id = id;
-            row.className = 'step-row transition-colors hover:bg-slate-50/80';
-            row.setAttribute('draggable', 'true');
-            row.dataset.level = level;
+            const card = document.createElement('div');
+            card.id = id;
+            card.className = `step-row rounded-2xl border p-4 sm:p-5 shadow-sm hover:shadow-md transition-all ${indentClass} ${borderAccent}`;
+            card.setAttribute('draggable', 'true');
+            card.dataset.level = level;
 
-            row.innerHTML = `
-                <td class="py-3.5 px-2 text-center cursor-move text-slate-400 hover:text-slate-700 drag-handle" title="Tahan & geser untuk mengubah urutan">
-                    <i class="fa-solid fa-grip-vertical text-sm"></i>
-                </td>
-                <td class="py-3.5 px-3 ${indentClass}">
-                    <div class="flex items-center space-x-2.5 w-full">
-                        <span class="shrink-0 text-slate-400 text-xs font-mono select-none">${arrowIcon}</span>
-                        <span class="shrink-0 text-[11px] font-black px-2.5 py-1 rounded-md border tracking-wider ${badgeClass}">
-                            ${level}
+            card.innerHTML = `
+                <!-- Top Row: Drag Handle, Badge Level, & Delete Button -->
+                <div class="flex items-center justify-between gap-3 mb-3">
+                    <div class="flex items-center space-x-2.5">
+                        <span class="cursor-move p-1.5 text-slate-400 hover:text-slate-700 drag-handle rounded-lg hover:bg-slate-100 transition-colors" title="Tahan & geser untuk mengubah urutan tahapan">
+                            <i class="fa-solid fa-grip-vertical text-base"></i>
                         </span>
-                        <input type="hidden" name="steps[${currentIndex}][level]" value="${level}">
-                        <div class="flex-1 w-full">
-                            <input type="text" name="steps[${currentIndex}][activity_description]" 
-                                   value="${initialData.activity_description ? initialData.activity_description.replace(/"/g, '&quot;') : ''}" 
-                                   placeholder="${placeholder}" 
-                                   required 
-                                   class="w-full bg-slate-50 text-slate-900 text-xs sm:text-sm font-semibold rounded-xl px-4 py-3 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all">
+                        <span class="text-xs font-mono text-slate-400 font-bold select-none">${arrowIcon}</span>
+                        <span class="inline-flex items-center space-x-1.5 text-[11px] font-black px-3 py-1 rounded-lg tracking-wide uppercase shadow-sm ${badgeClass}">
+                            <span>${level}</span>
+                        </span>
+                        <span class="text-xs font-bold text-slate-700 hidden sm:inline">${levelLabel}</span>
+                    </div>
+
+                    <div class="flex items-center space-x-2">
+                        <button type="button" onclick="removeStepRow('${id}')" title="Hapus Baris Level Ini" class="inline-flex items-center space-x-1 text-xs font-semibold px-2.5 py-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors border border-transparent hover:border-rose-200">
+                            <i class="fa-solid fa-trash-can"></i>
+                            <span class="hidden sm:inline">Hapus</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Middle: Huge Full-Width Input Box for L1/L2/L3 -->
+                <div class="mb-4">
+                    <input type="hidden" name="steps[${currentIndex}][level]" value="${level}">
+                    <textarea name="steps[${currentIndex}][activity_description]" 
+                              rows="2" 
+                              required 
+                              placeholder="${placeholder}"
+                              class="w-full bg-slate-50 text-slate-900 text-sm font-semibold rounded-xl p-3.5 sm:p-4 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all shadow-inner resize-y leading-relaxed">${initialData.activity_description ? initialData.activity_description.replace(/"/g, '&quot;') : ''}</textarea>
+                </div>
+
+                <!-- Bottom: RACI Section Placed Below the Input Box -->
+                <div class="pt-3 border-t border-slate-100 bg-slate-50/70 -mx-4 -mb-4 sm:-mx-5 sm:-mb-5 p-4 rounded-b-2xl">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-600 flex items-center space-x-1.5">
+                            <i class="fa-solid fa-users-gear text-indigo-500"></i>
+                            <span>Tanggung Jawab RACI untuk aktivitas ini:</span>
+                        </span>
+                        <span class="text-[10px] text-slate-400 hidden sm:inline">* Tahan Ctrl/Cmd untuk memilih beberapa jabatan</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <!-- Responsible (R) -->
+                        <div class="bg-white p-2.5 rounded-xl border border-indigo-200/80 shadow-xs">
+                            <label class="block text-[11px] font-black text-indigo-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                                <span>Responsible (R)</span>
+                                <span class="text-[9px] px-1.5 py-0.2 rounded bg-indigo-50 text-indigo-600 font-bold">Pelaksana</span>
+                            </label>
+                            <select name="steps[${currentIndex}][raci_r][]" multiple size="2" class="w-full bg-slate-50 text-slate-900 text-xs rounded-lg p-1.5 border border-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                                ${posOptionsR}
+                            </select>
+                        </div>
+
+                        <!-- Accountable (A) -->
+                        <div class="bg-white p-2.5 rounded-xl border border-amber-200/80 shadow-xs">
+                            <label class="block text-[11px] font-black text-amber-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                                <span>Accountable (A)</span>
+                                <span class="text-[9px] px-1.5 py-0.2 rounded bg-amber-50 text-amber-700 font-bold">Penanggung Jawab</span>
+                            </label>
+                            <select name="steps[${currentIndex}][raci_a]" class="w-full bg-slate-50 text-slate-900 text-xs rounded-lg p-2 border border-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500">
+                                ${posOptionsA}
+                            </select>
+                        </div>
+
+                        <!-- Consulted (C) -->
+                        <div class="bg-white p-2.5 rounded-xl border border-sky-200/80 shadow-xs">
+                            <label class="block text-[11px] font-black text-sky-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                                <span>Consulted (C)</span>
+                                <span class="text-[9px] px-1.5 py-0.2 rounded bg-sky-50 text-sky-600 font-bold">Konsultasi</span>
+                            </label>
+                            <select name="steps[${currentIndex}][raci_c][]" multiple size="2" class="w-full bg-slate-50 text-slate-900 text-xs rounded-lg p-1.5 border border-slate-200 focus:outline-none focus:ring-1 focus:ring-sky-500">
+                                ${posOptionsC}
+                            </select>
+                        </div>
+
+                        <!-- Informed (I) -->
+                        <div class="bg-white p-2.5 rounded-xl border border-emerald-200/80 shadow-xs">
+                            <label class="block text-[11px] font-black text-emerald-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                                <span>Informed (I)</span>
+                                <span class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-600 font-bold">Informasi</span>
+                            </label>
+                            <select name="steps[${currentIndex}][raci_i][]" multiple size="2" class="w-full bg-slate-50 text-slate-900 text-xs rounded-lg p-1.5 border border-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                                ${posOptionsI}
+                            </select>
                         </div>
                     </div>
-                </td>
-                <td class="py-3.5 px-2">
-                    <select name="steps[${currentIndex}][raci_r][]" multiple size="2" class="w-full bg-slate-50 text-slate-800 text-[11px] rounded-lg px-2 py-1.5 border border-indigo-200 focus:outline-none focus:ring-1 focus:ring-indigo-500" title="Tekan Ctrl/Cmd untuk memilih beberapa jabatan">
-                        ${posOptionsR}
-                    </select>
-                </td>
-                <td class="py-3.5 px-2">
-                    <select name="steps[${currentIndex}][raci_a]" class="w-full bg-slate-50 text-slate-800 text-[11px] rounded-lg px-2 py-1.5 border border-amber-200 focus:outline-none focus:ring-1 focus:ring-amber-500">
-                        ${posOptionsA}
-                    </select>
-                </td>
-                <td class="py-3.5 px-2">
-                    <select name="steps[${currentIndex}][raci_c][]" multiple size="2" class="w-full bg-slate-50 text-slate-800 text-[11px] rounded-lg px-2 py-1.5 border border-sky-200 focus:outline-none focus:ring-1 focus:ring-sky-500" title="Tekan Ctrl/Cmd untuk memilih beberapa jabatan">
-                        ${posOptionsC}
-                    </select>
-                </td>
-                <td class="py-3.5 px-2">
-                    <select name="steps[${currentIndex}][raci_i][]" multiple size="2" class="w-full bg-slate-50 text-slate-800 text-[11px] rounded-lg px-2 py-1.5 border border-emerald-200 focus:outline-none focus:ring-1 focus:ring-emerald-500" title="Tekan Ctrl/Cmd untuk memilih beberapa jabatan">
-                        ${posOptionsI}
-                    </select>
-                </td>
-                <td class="py-3.5 px-2 text-center">
-                    <button type="button" onclick="removeStepRow('${id}')" title="Hapus Baris" class="p-2 text-slate-400 hover:text-rose-600 rounded-lg transition-colors">
-                        <i class="fa-solid fa-trash-can text-sm"></i>
-                    </button>
-                </td>
+                </div>
             `;
 
-            tbody.appendChild(row);
-            attachDragAndDrop(row);
-            attachDragAndDrop(row);
+            container.appendChild(card);
+            attachDragAndDrop(card);
+        }
+
+        function removeStepRow(rowId) {
+            Swal.fire({
+                title: 'Hapus tahapan ini?',
+                text: 'Baris level dan seluruh data RACI pada tahapan ini akan dihapus.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e11d48',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const row = document.getElementById(rowId);
+                    if (row) {
+                        row.remove();
+                        checkEmptyBuilder();
+                    }
+                }
+            });
+        }
+
+        function checkEmptyBuilder() {
+            const rows = document.querySelectorAll('#builderCardsContainer .step-row');
+            const emptyState = document.getElementById('builderEmptyState');
+            if (emptyState) {
+                if (rows.length === 0) {
+                    emptyState.classList.remove('hidden');
+                } else {
+                    emptyState.classList.add('hidden');
+                }
+            }
+        }
+
+        let dragSrcEl = null;
+
+        function attachDragAndDrop(card) {
+            card.addEventListener('dragstart', function(e) {
+                dragSrcEl = this;
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/html', this.outerHTML);
+                this.classList.add('opacity-40');
+            });
+
+            card.addEventListener('dragover', function(e) {
+                if (e.preventDefault) e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                return false;
+            });
+
+            card.addEventListener('dragenter', function(e) {
+                this.classList.add('ring-2', 'ring-indigo-500');
+            });
+
+            card.addEventListener('dragleave', function(e) {
+                this.classList.remove('ring-2', 'ring-indigo-500');
+            });
+
+            card.addEventListener('drop', function(e) {
+                if (e.stopPropagation) e.stopPropagation();
+                if (dragSrcEl !== this) {
+                    const container = document.getElementById('builderCardsContainer');
+                    const allCards = Array.from(container.querySelectorAll('.step-row'));
+                    const srcIndex = allCards.indexOf(dragSrcEl);
+                    const targetIndex = allCards.indexOf(this);
+
+                    if (srcIndex < targetIndex) {
+                        container.insertBefore(dragSrcEl, this.nextSibling);
+                    } else {
+                        container.insertBefore(dragSrcEl, this);
+                    }
+                }
+                return false;
+            });
+
+            card.addEventListener('dragend', function() {
+                this.classList.remove('opacity-40');
+                const allCards = document.querySelectorAll('#builderCardsContainer .step-row');
+                allCards.forEach(c => c.classList.remove('ring-2', 'ring-indigo-500'));
+            });
         }
 
         function removeStepRow(rowId) {
@@ -455,7 +566,7 @@
         }
 
         function checkEmptyBuilder() {
-            const rows = document.querySelectorAll('#builderTableBody .step-row');
+            const rows = document.querySelectorAll('#builderCardsContainer .step-row');
             const emptyState = document.getElementById('builderEmptyState');
             if (emptyState) {
                 if (rows.length === 0) {
@@ -509,7 +620,7 @@
 
             row.addEventListener('dragend', function() {
                 this.classList.remove('opacity-40');
-                const allRows = document.querySelectorAll('#builderTableBody .step-row');
+                const allRows = document.querySelectorAll('#builderCardsContainer .step-row');
                 allRows.forEach(r => r.classList.remove('bg-indigo-50/50'));
             });
         }
