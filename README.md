@@ -1,4 +1,4 @@
-# Sistem Informasi Manajemen Dokumen HRD (SIMD HRD)
+# Sistem Informasi Manajemen Arsip HRD (SIMA HRD)
 
 Sistem berbasis web yang digunakan untuk menyimpan, mengelola, dan menampilkan berbagai dokumen HRD dengan konsep direktori hirarki menyerupai Google Drive (Divisi &rarr; Jabatan &rarr; Dokumen).
 

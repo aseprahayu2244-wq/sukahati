@@ -4,9 +4,11 @@ use App\Http\Controllers\BodController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\DivisionController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SopWorkflowController;
 use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,6 +24,55 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::patch('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // =========================================================
+    // Notifications (Internal In-App Notifications)
+    // =========================================================
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/{notification}/read', [NotificationController::class, 'read'])->name('notifications.read');
+    Route::post('/notifications/mark-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAll');
+
+    // =========================================================
+    // SOP Approval Workflow (General Viewing for Authenticated)
+    // =========================================================
+    Route::get('/sops', [SopWorkflowController::class, 'index'])->name('sops.index');
+    Route::get('/sops/create/form', [SopWorkflowController::class, 'create'])->name('sops.create');
+    Route::post('/sops', [SopWorkflowController::class, 'store'])->name('sops.store');
+    Route::get('/sops/{sop}', [SopWorkflowController::class, 'show'])->name('sops.show');
+    Route::get('/sops/{sop}/print', [SopWorkflowController::class, 'print'])->name('sops.print');
+    Route::get('/sops/{sop}/edit', [SopWorkflowController::class, 'edit'])->name('sops.edit');
+    Route::put('/sops/{sop}', [SopWorkflowController::class, 'update'])->name('sops.update');
+    Route::delete('/sops/{sop}', [SopWorkflowController::class, 'destroy'])->name('sops.destroy');
+    Route::get('/sops/{sop}/attachments/{attachment}/download', [SopWorkflowController::class, 'downloadAttachment'])->name('sops.attachments.download');
+    Route::get('/sops/{sop}/attachments/{attachment}/preview', [SopWorkflowController::class, 'previewAttachment'])->name('sops.attachments.preview');
+    Route::delete('/sops/{sop}/attachments/{attachment}', [SopWorkflowController::class, 'deleteAttachment'])->name('sops.attachments.delete');
+
+    // Super Admin SOP Decision Routes
+    Route::middleware(['role:super_admin'])->group(function () {
+        Route::post('/sops/{sop}/approve', [SopWorkflowController::class, 'approve'])->name('sops.approve');
+        Route::post('/sops/{sop}/reject', [SopWorkflowController::class, 'reject'])->name('sops.reject');
+    });
+
+    // =========================================================
+    // BPM Workflow & Builder (BPM Management, Builder & Approval)
+    // =========================================================
+    Route::get('/bpms', [\App\Http\Controllers\BpmWorkflowController::class, 'index'])->name('bpms.index');
+    Route::get('/bpms/create/form', [\App\Http\Controllers\BpmWorkflowController::class, 'create'])->name('bpms.create');
+    Route::post('/bpms', [\App\Http\Controllers\BpmWorkflowController::class, 'store'])->name('bpms.store');
+    Route::get('/bpms/{bpm}', [\App\Http\Controllers\BpmWorkflowController::class, 'show'])->name('bpms.show');
+    Route::get('/bpms/{bpm}/preview', [\App\Http\Controllers\BpmWorkflowController::class, 'preview'])->name('bpms.preview');
+    Route::get('/bpms/{bpm}/print', [\App\Http\Controllers\BpmWorkflowController::class, 'print'])->name('bpms.print');
+    Route::get('/bpms/{bpm}/edit', [\App\Http\Controllers\BpmWorkflowController::class, 'edit'])->name('bpms.edit');
+    Route::put('/bpms/{bpm}', [\App\Http\Controllers\BpmWorkflowController::class, 'update'])->name('bpms.update');
+    Route::delete('/bpms/{bpm}', [\App\Http\Controllers\BpmWorkflowController::class, 'destroy'])->name('bpms.destroy');
+    Route::get('/bpms/{bpm}/attachments/{attachment}/download', [\App\Http\Controllers\BpmWorkflowController::class, 'downloadAttachment'])->name('bpms.attachments.download');
+    Route::get('/bpms/{bpm}/attachments/{attachment}/preview', [\App\Http\Controllers\BpmWorkflowController::class, 'previewAttachment'])->name('bpms.attachments.preview');
+
+    // Super Admin BPM Decision Routes
+    Route::middleware(['role:super_admin'])->group(function () {
+        Route::post('/bpms/{bpm}/approve', [\App\Http\Controllers\BpmWorkflowController::class, 'approve'])->name('bpms.approve');
+        Route::post('/bpms/{bpm}/reject', [\App\Http\Controllers\BpmWorkflowController::class, 'reject'])->name('bpms.reject');
+    });
 
     // =========================================================
     // Document Browser (all authenticated users can view)

@@ -6,7 +6,7 @@
         </div>
         <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Perbarui Kata Sandi</h2>
         <p class="text-xs sm:text-sm text-slate-500 mt-1">
-            Silakan masukkan kata sandi baru untuk akun SIMD HRD Anda.
+            Silakan masukkan kata sandi baru untuk akun SIMA HRD Anda.
         </p>
     </div>
 

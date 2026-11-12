@@ -16,7 +16,7 @@
     <!-- Title Section -->
     <div class="mb-6">
         
-        <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Buat Akun SIMD HRD</h2>
+        <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Buat Akun SIMA HRD</h2>
         
     </div>
 

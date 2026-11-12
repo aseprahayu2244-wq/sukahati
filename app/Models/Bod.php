@@ -21,6 +21,11 @@ class Bod extends Model
         return $this->hasMany(Document::class, 'bod_id');
     }
 
+    public function sops()
+    {
+        return $this->hasMany(Sop::class, 'bod_id');
+    }
+
     public function getDocumentCountByType(string $type): int
     {
         return $this->documents()->where('type', $type)->count();

@@ -14,105 +14,132 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // --- Users ---------------------------------------------------
-        User::create([
-            'name'      => 'Super Admin',
-            'username'  => 'superadmin',
-            'email'     => 'superadmin@sukhati.com',
-            'password'  => Hash::make('password'),
-            'role'      => 'super_admin',
-            'jabatan'   => 'Super Administrator',
-            'is_active' => true,
-        ]);
+        User::firstOrCreate(
+            ['email' => 'superadmin@sukhati.com'],
+            [
+                'name'      => 'Super Administrator',
+                'username'  => 'superadmin',
+                'password'  => Hash::make('password'),
+                'role'      => 'super_admin',
+                'jabatan'   => 'Super Administrator',
+                'is_active' => true,
+            ]
+        );
 
-        User::create([
-            'name'      => 'Admin HRD',
-            'username'  => 'admin',
-            'email'     => 'admin@sukhati.com',
-            'password'  => Hash::make('password'),
-            'role'      => 'admin',
-            'jabatan'   => 'Administrator HRD',
-            'is_active' => true,
-        ]);
+        User::firstOrCreate(
+            ['email' => 'admin@sukhati.com'],
+            [
+                'name'      => 'Admin HRD',
+                'username'  => 'admin',
+                'password'  => Hash::make('password'),
+                'role'      => 'admin',
+                'jabatan'   => 'Administrator HRD',
+                'is_active' => true,
+            ]
+        );
 
-        User::create([
-            'name'      => 'Anggota Umum',
-            'username'  => 'anggota',
-            'email'     => 'anggota@sukhati.com',
-            'password'  => Hash::make('password'),
-            'role'      => 'anggota',
-            'jabatan'   => 'Staff Umum',
-            'is_active' => true,
-        ]);
+        User::firstOrCreate(
+            ['email' => 'anggota@sukhati.com'],
+            [
+                'name'      => 'Staff Anggota',
+                'username'  => 'anggota',
+                'password'  => Hash::make('password'),
+                'role'      => 'anggota',
+                'jabatan'   => 'Staff Umum',
+                'is_active' => true,
+            ]
+        );
+
+        User::firstOrCreate(
+            ['email' => 'anakiniy18@gmail.com'],
+            [
+                'name'      => 'hirara',
+                'username'  => 'hirara_super',
+                'password'  => Hash::make('password'),
+                'role'      => 'super_admin',
+                'jabatan'   => 'Super Administrator',
+                'is_active' => true,
+            ]
+        );
+
+        User::firstOrCreate(
+            ['email' => 'pepi@gmail.com'],
+            [
+                'name'      => 'PEPI',
+                'username'  => 'pepi',
+                'password'  => Hash::make('password'),
+                'role'      => 'anggota',
+                'jabatan'   => 'Staff',
+                'is_active' => true,
+            ]
+        );
+
+        User::firstOrCreate(
+            ['email' => 'anakiniy8@gmail.com'],
+            [
+                'name'      => 'hirara',
+                'username'  => 'hirara_anggota',
+                'password'  => Hash::make('password'),
+                'role'      => 'anggota',
+                'jabatan'   => 'Staff',
+                'is_active' => true,
+            ]
+        );
 
         // --- BODs ---------------------------------------------------
-        $bodA = Bod::create([
-            'name'        => 'BOD A',
-            'description' => 'Direksi A - Operasional & SDM',
-            'color'       => '#3b82f6',
-            'order'       => 1,
-        ]);
-
-        $bodB = Bod::create([
-            'name'        => 'BOD B',
-            'description' => 'Direksi B - Keuangan & Produksi',
-            'color'       => '#10b981',
-            'order'       => 2,
-        ]);
-
-        // --- Departments (Divisions) under BOD A -------------------
-        $divData = [
+        $bodCoo = Bod::firstOrCreate(
+            ['name' => 'COO'],
             [
-                'bod_id' => $bodA->id, 'name' => 'HRD',
-                'color' => '#3b82f6', 'order' => 1,
-                'description' => 'Departemen Human Resource Development',
-                'positions' => ['HR Manager', 'Staff HRD', 'Recruitment Staff'],
-            ],
+                'description' => 'Chief Operating Officer',
+                'color'       => '#3b82f6',
+                'order'       => 1,
+            ]
+        );
+
+        $bodCbd = Bod::firstOrCreate(
+            ['name' => 'CBD'],
             [
-                'bod_id' => $bodA->id, 'name' => 'Marketing',
-                'color' => '#ef4444', 'order' => 2,
-                'description' => 'Departemen Marketing & Pemasaran',
-                'positions' => ['Marketing Manager', 'Staff Marketing'],
-            ],
-        ];
+                'description' => 'Chief Business Development',
+                'color'       => '#f73b3b',
+                'order'       => 2,
+            ]
+        );
 
-        // --- Departments under BOD B ---
-        $divData[] = [
-            'bod_id' => $bodB->id, 'name' => 'Keuangan',
-            'color' => '#10b981', 'order' => 3,
-            'description' => 'Departemen Keuangan & Akuntansi',
-            'positions' => ['Finance Manager', 'Staff Finance', 'Staff Akuntansi'],
-        ];
+        $bodCfo = Bod::firstOrCreate(
+            ['name' => 'CFO'],
+            [
+                'description' => 'Chief Financial Officer',
+                'color'       => '#3bf751',
+                'order'       => 3,
+            ]
+        );
 
-        $divData[] = [
-            'bod_id' => $bodB->id, 'name' => 'Produksi',
-            'color' => '#f59e0b', 'order' => 4,
-            'description' => 'Departemen Produksi & Operasional',
-            'positions' => ['Manager Produksi', 'Supervisor Produksi', 'Staff Produksi'],
-        ];
+        // --- Departments COO ---
+        $cooDepts = ['SALES', 'BISDEV', 'OPRASIONAL', 'ARMADA', 'BENGKEL', 'TEKNISI', 'SECRETARY'];
+        $order = 1;
+        foreach ($cooDepts as $dName) {
+            Division::firstOrCreate(
+                ['bod_id' => $bodCoo->id, 'name' => $dName],
+                ['color' => '#3b82f6', 'order' => $order++]
+            );
+        }
 
-        $divData[] = [
-            'bod_id' => $bodB->id, 'name' => 'IT',
-            'color' => '#8b5cf6', 'order' => 5,
-            'description' => 'Departemen Teknologi Informasi',
-            'positions' => ['IT Manager', 'Staff IT', 'Developer'],
-        ];
+        // --- Departments CBD ---
+        $cbdDepts = ['HRD', 'GA', 'SPI', 'QA QC', 'KREY'];
+        foreach ($cbdDepts as $dName) {
+            Division::firstOrCreate(
+                ['bod_id' => $bodCbd->id, 'name' => $dName],
+                ['color' => '#f73b3b', 'order' => $order++]
+            );
+        }
 
-        foreach ($divData as $data) {
-            $positions = $data['positions'];
-            unset($data['positions']);
-
-            $division = Division::create($data);
-
-            $order = 1;
-            foreach ($positions as $posName) {
-                Position::create([
-                    'division_id' => $division->id,
-                    'name'        => $posName,
-                    'level'       => 0,
-                    'order'       => $order++,
-                    'parent_id'   => null,
-                ]);
-            }
+        // --- Departments CFO ---
+        $cfoDepts = ['KEUANGAN', 'AKUNTING', 'PURCHESING'];
+        foreach ($cfoDepts as $dName) {
+            Division::firstOrCreate(
+                ['bod_id' => $bodCfo->id, 'name' => $dName],
+                ['color' => '#3bf751', 'order' => $order++]
+            );
         }
     }
 }

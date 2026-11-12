@@ -15,9 +15,9 @@
 
     <!-- Title Section -->
     <div class="mb-6">
-        <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Masuk SIMD HRD</h2>
+        <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Masuk SIMA HRD</h2>
         <p class="text-xs sm:text-sm text-slate-500 mt-1">
-            Gunakan email dan kata sandi Anda untuk mengakses sistem SIMD HRD.
+            Gunakan email dan kata sandi Anda untuk mengakses sistem SIMA HRD.
         </p>
     </div>
 

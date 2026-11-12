@@ -27,6 +27,11 @@ class Division extends Model
         return $this->hasMany(Document::class);
     }
 
+    public function sops()
+    {
+        return $this->hasMany(Sop::class, 'department_id');
+    }
+
     public function getDocumentCountByType(string $type): int
     {
         return $this->documents()->where('type', $type)->count();

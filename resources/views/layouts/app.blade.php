@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ $title ?? 'SIMD HRD' }} - Sistem Informasi Manajemen Dokumen HRD</title>
+    <title>{{ $title ?? 'SIMA HRD' }} - Sistem Informasi Manajemen Arsip HRD</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -66,7 +66,7 @@
                             <img src="{{ asset('images/logo-sukahati.png') }}" alt="CV. Sukahati Pratama" class="w-full h-full object-contain">
                         </div>
                         <div>
-                            <h1 class="font-extrabold text-lg text-white tracking-wider leading-none">SIMD <span class="text-blue-400">HRD</span></h1>
+                            <h1 class="font-extrabold text-lg text-white tracking-wider leading-none">SIMA <span class="text-blue-400">HRD</span></h1>
                             <p class="text-[10px] text-slate-400 tracking-wider uppercase font-semibold mt-1">CV. Sukahati Pratama</p>
                         </div>
                     </a>
@@ -98,6 +98,23 @@
                                 <span class="bg-emerald-500/20 text-emerald-300 text-[10px] px-2 py-0.5 rounded-full font-bold">SOP</span>
                             </a>
 
+                            @if(auth()->check() && auth()->user()->canManageDocuments())
+                            <a href="{{ route('sops.index') }}" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all-200 {{ request()->is('sops*') ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30 font-semibold' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fa-solid fa-clipboard-check w-5 text-center text-teal-400"></i>
+                                    <span>Pengajuan SOP</span>
+                                </div>
+                                <div class="flex items-center space-x-1">
+                                    @if(auth()->user()->isSuperAdmin() && ($globalPendingSopCount ?? 0) > 0)
+                                        <span class="bg-amber-500 text-slate-900 text-[10px] px-2 py-0.5 rounded-full font-extrabold animate-pulse">{{ $globalPendingSopCount }}</span>
+                                    @elseif(auth()->user()->isAdmin() && ($globalRejectedSopCount ?? 0) > 0)
+                                        <span class="bg-rose-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">{{ $globalRejectedSopCount }}</span>
+                                    @endif
+                                    <span class="bg-teal-500/20 text-teal-300 text-[10px] px-2 py-0.5 rounded-full font-bold">WF</span>
+                                </div>
+                            </a>
+                            @endif
+
                             <a href="{{ route('documents.index', 'job_desk') }}" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all-200 {{ request()->is('docs/job_desk*') ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30 font-semibold' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
                                 <div class="flex items-center space-x-3">
                                     <i class="fa-solid fa-user-gear w-5 text-center text-amber-400"></i>
@@ -109,10 +126,26 @@
                             <a href="{{ route('documents.index', 'bpm') }}" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all-200 {{ request()->is('docs/bpm*') ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30 font-semibold' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
                                 <div class="flex items-center space-x-3">
                                     <i class="fa-solid fa-diagram-project w-5 text-center text-rose-400"></i>
-                                    <span>BPM</span>
+                                    <span>BPM (Proses Bisnis)</span>
                                 </div>
                                 <span class="bg-rose-500/20 text-rose-300 text-[10px] px-2 py-0.5 rounded-full font-bold">BPM</span>
                             </a>
+
+                            @if(auth()->check() && auth()->user()->canManageDocuments())
+                            <a href="{{ route('bpms.index') }}" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all-200 {{ request()->is('bpms*') ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 font-semibold' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fa-solid fa-network-wired w-5 text-center text-indigo-400"></i>
+                                    <span>BPM Workflow & Builder</span>
+                                </div>
+                                <div class="flex items-center space-x-1">
+                                    @if(auth()->user()->isSuperAdmin() && ($globalPendingBpmCount ?? 0) > 0)
+                                        <span class="bg-amber-500 text-slate-900 text-[10px] px-2 py-0.5 rounded-full font-extrabold animate-pulse">{{ $globalPendingBpmCount }}</span>
+                                    @elseif(auth()->user()->isAdmin() && ($globalRejectedBpmCount ?? 0) > 0)
+                                        <span class="bg-rose-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">{{ $globalRejectedBpmCount }}</span>
+                                    @endif
+                                </div>
+                            </a>
+                            @endif
 
                             <a href="{{ route('documents.index', 'struktur') }}" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all-200 {{ request()->is('docs/struktur*') ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30 font-semibold' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
                                 <div class="flex items-center space-x-3">
@@ -220,13 +253,34 @@
                     @endif
                 </div>
 
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-3">
                     @if(auth()->check() && auth()->user()->canManageDocuments())
-                    <a href="{{ route('documents.create') }}" class="inline-flex items-center space-x-2 text-xs font-bold px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl shadow-md shadow-blue-500/20 transition-all-200">
-                        <i class="fa-solid fa-plus"></i>
-                        <span>Upload Dokumen</span>
+                    <a href="{{ route('bpms.create') }}" class="hidden sm:inline-flex items-center space-x-2 text-xs font-bold px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-md shadow-indigo-500/20 transition-all-200">
+                        <i class="fa-solid fa-network-wired"></i>
+                        <span>BPM Builder</span>
+                    </a>
+                    <a href="{{ route('sops.create') }}" class="hidden sm:inline-flex items-center space-x-2 text-xs font-bold px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-md shadow-emerald-500/20 transition-all-200">
+                        <i class="fa-solid fa-file-signature"></i>
+                        <span>Buat SOP</span>
+                    </a>
+                    <a href="{{ route('documents.create') }}" class="inline-flex items-center space-x-2 text-xs font-bold px-3.5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl shadow-md shadow-blue-500/20 transition-all-200">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <span class="hidden sm:inline">Upload Dokumen</span>
                     </a>
                     @endif
+
+                    <!-- Notification Bell -->
+                    @if(auth()->check())
+                    <a href="{{ route('notifications.index') }}" title="Notifikasi Sistem" class="relative p-2 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-all-200">
+                        <i class="fa-solid fa-bell text-lg"></i>
+                        @if(($globalUnreadNotifsCount ?? 0) > 0)
+                            <span class="absolute top-1 right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[9px] font-extrabold flex items-center justify-center animate-pulse">
+                                {{ $globalUnreadNotifsCount > 9 ? '9+' : $globalUnreadNotifsCount }}
+                            </span>
+                        @endif
+                    </a>
+                    @endif
+
                     <a href="{{ route('profile.edit') }}" class="flex items-center space-x-2 text-xs text-slate-600 hover:text-blue-600 transition-all-200">
                         @if(auth()->user()->avatar)
                             <img src="{{ Storage::url(auth()->user()->avatar) }}" class="w-8 h-8 rounded-full object-cover" alt="Avatar">
@@ -285,7 +339,7 @@
 
             <!-- Footer -->
             <footer class="px-6 py-4 border-t border-slate-200 text-center text-xs text-slate-400">
-                &copy; {{ date('Y') }} SIMD HRD - Sistem Informasi Manajemen Dokumen HRD. Framework Laravel 10.
+                &copy; {{ date('Y') }} SIMA HRD - Sistem Informasi Manajemen Arsip HRD. Framework Laravel 10.
             </footer>
         </div>
 

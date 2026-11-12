@@ -57,6 +57,24 @@
                 </a>
             @endif
 
+            @if($type === 'sop' && auth()->check() && auth()->user()->canManageDocuments())
+            <a href="{{ route('sops.create', ['department_id' => $department->id]) }}" class="inline-flex items-center space-x-2 text-xs font-bold px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-md shadow-emerald-500/20 transition-all-200">
+                <i class="fa-solid fa-file-signature"></i>
+                <span>Buat SOP / Ajukan SOP</span>
+            </a>
+            @endif
+
+            @if($type === 'bpm' && auth()->check() && auth()->user()->canManageDocuments())
+            <a href="{{ route('bpms.create', ['department_id' => $department->id, 'mode' => 'builder']) }}" class="inline-flex items-center space-x-2 text-xs font-bold px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-md shadow-indigo-500/20 transition-all-200">
+                <i class="fa-solid fa-network-wired"></i>
+                <span>BPM Builder</span>
+            </a>
+            <a href="{{ route('bpms.create', ['department_id' => $department->id, 'mode' => 'upload']) }}" class="inline-flex items-center space-x-2 text-xs font-bold px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl shadow-md shadow-rose-500/20 transition-all-200">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <span>Upload BPM</span>
+            </a>
+            @endif
+
             @if(auth()->check() && auth()->user()->canManageDocuments())
             <a href="{{ route('documents.create', [
                 'type'          => $type,
@@ -70,6 +88,128 @@
             @endif
         </div>
     </div>
+
+    @if(isset($digitalBpms) && $digitalBpms->count() > 0)
+        <!-- Digital BPMs Section -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center space-x-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+                    <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">BPM Resmi Dipublikasikan</h2>
+                    <span class="bg-indigo-100 text-indigo-800 text-[11px] font-bold px-2 py-0.5 rounded-full">{{ $digitalBpms->count() }} Dokumen</span>
+                </div>
+                @if(auth()->check() && auth()->user()->canManageDocuments())
+                <a href="{{ route('bpms.index') }}" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center space-x-1">
+                    <span>Semua Workflow BPM</span>
+                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                </a>
+                @endif
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                @foreach($digitalBpms as $dBpm)
+                    <div class="bg-white rounded-2xl p-5 border border-indigo-200/80 shadow-sm hover:shadow-md transition-all-200 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="bg-indigo-50 text-indigo-700 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-indigo-200">
+                                    Resmi Dipublikasikan
+                                </span>
+                                <span class="text-[10px] font-mono text-slate-400 font-bold">v{{ $dBpm->version }}</span>
+                            </div>
+                            <h3 class="font-bold text-slate-900 text-sm hover:text-indigo-600 transition-colors line-clamp-2">
+                                <a href="{{ route('bpms.show', $dBpm->id) }}">{{ $dBpm->nama_bpm }}</a>
+                            </h3>
+                            <p class="text-[11px] font-mono text-slate-500 mt-1 mb-2">{{ $dBpm->nomor_dokumen }}</p>
+                            @if($dBpm->deskripsi)
+                                <p class="text-xs text-slate-600 line-clamp-2">{{ Str::limit(strip_tags($dBpm->deskripsi), 100) }}</p>
+                            @endif
+                            <div class="mt-2.5 flex items-center space-x-2 text-[11px] text-slate-500">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded bg-slate-100 font-medium text-[10px]">
+                                    <i class="fa-solid {{ $dBpm->isBuilder() ? 'fa-diagram-project text-indigo-500' : 'fa-file-pdf text-rose-500' }} mr-1"></i>
+                                    {{ $dBpm->isBuilder() ? ($dBpm->steps->count() . ' Tahapan L1-L3') : 'Upload Dokumen' }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                            <span class="text-[10px] text-slate-400">Efektif: {{ $dBpm->tanggal_efektif ? $dBpm->tanggal_efektif->format('d/m/Y') : '-' }}</span>
+                            <div class="flex items-center space-x-2">
+                                <a href="{{ route('bpms.print', $dBpm->id) }}" target="_blank" title="Download PDF" class="p-1.5 text-slate-400 hover:text-slate-700">
+                                    <i class="fa-solid fa-file-arrow-down"></i>
+                                </a>
+                                <a href="{{ route('bpms.show', $dBpm->id) }}" class="font-bold text-indigo-600 hover:text-indigo-800 flex items-center space-x-1">
+                                    <span>Buka BPM</span>
+                                    <i class="fa-solid fa-chevron-right text-[9px]"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-2 mb-4 pt-2 border-t border-slate-200">
+            <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+            <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Berkas Arsip Upload</h2>
+            <span class="bg-slate-100 text-slate-600 text-[11px] font-bold px-2 py-0.5 rounded-full">{{ $documents->count() }} Berkas</span>
+        </div>
+    @endif
+
+    @if(isset($digitalSops) && $digitalSops->count() > 0)
+        <!-- Digital SOPs Section -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center space-x-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                    <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">SOP Digital Resmi (Disetujui)</h2>
+                    <span class="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2 py-0.5 rounded-full">{{ $digitalSops->count() }} Dokumen</span>
+                </div>
+                @if(auth()->check() && auth()->user()->canManageDocuments())
+                <a href="{{ route('sops.index') }}" class="text-xs font-semibold text-blue-600 hover:text-blue-800 flex items-center space-x-1">
+                    <span>Semua Workflow SOP</span>
+                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                </a>
+                @endif
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                @foreach($digitalSops as $dSop)
+                    <div class="bg-white rounded-2xl p-5 border border-emerald-200/80 shadow-sm hover:shadow-md transition-all-200 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-emerald-200">
+                                    Resmi Dipublikasikan
+                                </span>
+                                <span class="text-[10px] font-mono text-slate-400 font-bold">v{{ $dSop->version }}</span>
+                            </div>
+                            <h3 class="font-bold text-slate-900 text-sm hover:text-blue-600 transition-colors line-clamp-2">
+                                <a href="{{ route('sops.show', $dSop->id) }}">{{ $dSop->nama_sop }}</a>
+                            </h3>
+                            <p class="text-[11px] font-mono text-slate-500 mt-1 mb-2">{{ $dSop->nomor_dokumen }}</p>
+                            <p class="text-xs text-slate-600 line-clamp-2">{{ Str::limit(strip_tags($dSop->tujuan), 100) }}</p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                            <span class="text-[10px] text-slate-400">Efektif: {{ $dSop->tanggal_efektif ? $dSop->tanggal_efektif->format('d/m/Y') : '-' }}</span>
+                            <div class="flex items-center space-x-2">
+                                <a href="{{ route('sops.print', $dSop->id) }}" target="_blank" title="Download PDF" class="p-1.5 text-slate-400 hover:text-slate-700">
+                                    <i class="fa-solid fa-file-arrow-down"></i>
+                                </a>
+                                <a href="{{ route('sops.show', $dSop->id) }}" class="font-bold text-blue-600 hover:text-blue-800 flex items-center space-x-1">
+                                    <span>Buka SOP</span>
+                                    <i class="fa-solid fa-chevron-right text-[9px]"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-2 mb-4 pt-2 border-t border-slate-200">
+            <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+            <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Berkas Arsip Upload</h2>
+            <span class="bg-slate-100 text-slate-600 text-[11px] font-bold px-2 py-0.5 rounded-full">{{ $documents->count() }} Berkas</span>
+        </div>
+    @endif
 
     <!-- Search Bar -->
     <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">

@@ -119,6 +119,21 @@ class User extends Authenticatable
         return $this->hasMany(Document::class, 'uploaded_by');
     }
 
+    public function sops()
+    {
+        return $this->hasMany(Sop::class, 'created_by');
+    }
+
+    public function appNotifications()
+    {
+        return $this->hasMany(Notification::class, 'user_id')->latest('created_at');
+    }
+
+    public function unreadNotificationsCount(): int
+    {
+        return $this->hasMany(Notification::class, 'user_id')->whereNull('read_at')->count();
+    }
+
     // Backward compat aliases (used in old views)
     public function isKetua(): bool
     {

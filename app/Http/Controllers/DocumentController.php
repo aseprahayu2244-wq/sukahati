@@ -85,11 +85,29 @@ class DocumentController extends Controller
                 ->latest()
                 ->get();
 
+            $digitalSops = collect();
+            if ($type === 'sop') {
+                $digitalSops = \App\Models\Sop::where('status', \App\Models\Sop::STATUS_APPROVED)
+                    ->where('department_id', $department->id)
+                    ->with(['creator', 'approver'])
+                    ->latest('approved_at')
+                    ->get();
+            }
+
+            $digitalBpms = collect();
+            if ($type === 'bpm') {
+                $digitalBpms = \App\Models\Bpm::where('status', \App\Models\Bpm::STATUS_APPROVED)
+                    ->where('department_id', $department->id)
+                    ->with(['creator', 'approver', 'steps.raci.position', 'attachments'])
+                    ->latest('approved_at')
+                    ->get();
+            }
+
             $typeLabel = Document::$typeLabels[$type] ?? strtoupper($type);
             $typeColor = Document::$typeColors[$type] ?? '#3b82f6';
             $typeIcon  = Document::$typeIcons[$type] ?? 'fa-folder';
 
-            return view('documents.files', compact('type', 'typeLabel', 'typeColor', 'typeIcon', 'bod', 'department', 'documents'));
+            return view('documents.files', compact('type', 'typeLabel', 'typeColor', 'typeIcon', 'bod', 'department', 'documents', 'digitalSops', 'digitalBpms'));
         }
     }
 

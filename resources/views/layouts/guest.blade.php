@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ $title ?? 'SIMD HRD' }} - CV. Sukahati Pratama</title>
+    <title>{{ $title ?? 'SIMA HRD' }} - CV. Sukahati Pratama</title>
     
     <!-- Favicon -->
     <link rel="shortcut icon" href="{{ asset('images/logo-sukahati.png') }}" type="image/png">
@@ -93,7 +93,7 @@
                 </h1>
                 
                 <p class="text-xs sm:text-sm text-blue-200/80 font-medium mt-1.5 max-w-sm">
-                    Sistem Informasi Manajemen Dokumen HRD (SIMD)
+                    Sistem Informasi Manajemen Arsip HRD (SIMA)
                 </p>
 
                 <div class="mt-5 flex items-center space-x-2 text-[11px] font-semibold uppercase tracking-wider text-amber-400/90 bg-white/5 border border-white/10 px-3.5 py-1.5 rounded-xl backdrop-blur-sm">
@@ -127,7 +127,7 @@
                         <span class="inline-block text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 bg-blue-500/20 text-blue-300 rounded border border-blue-400/30">
                             CV. Sukahati Pratama
                         </span>
-                        <h2 class="text-base font-bold text-white leading-tight mt-0.5">SIMD HRD</h2>
+                        <h2 class="text-base font-bold text-white leading-tight mt-0.5">SIMA HRD</h2>
                         <p class="text-[11px] text-slate-300">Chicken Processing Industry</p>
                     </div>
                 </div>
