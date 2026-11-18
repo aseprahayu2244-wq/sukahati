@@ -13,6 +13,7 @@ use App\Models\Division;
 use App\Models\Notification;
 use App\Models\Position;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -349,9 +350,9 @@ class BpmWorkflowController extends Controller
     }
 
     /**
-     * Printable view / Export to PDF
+     * Download BPM Document as PDF directly
      */
-    public function print(Bpm $bpm)
+    public function downloadPdf(Bpm $bpm)
     {
         $user = auth()->user();
         abort_unless($bpm->canBeViewedBy($user), 403);
@@ -365,7 +366,45 @@ class BpmWorkflowController extends Controller
             'attachments',
         ]);
 
-        return view('bpms.print', compact('bpm'));
+        $filename = 'BPM_' . Str::slug($bpm->nomor_dokumen) . '_' . Str::slug($bpm->nama_bpm) . '.pdf';
+
+        $pdf = Pdf::loadView('bpms.print', [
+            'bpm' => $bpm,
+            'isPdf' => true,
+        ])->setPaper('a4', 'portrait')
+          ->setOption([
+              'isHtml5ParserEnabled' => true,
+              'isRemoteEnabled' => false,
+          ]);
+
+        return $pdf->download($filename);
+    }
+
+    /**
+     * Printable view / Export to PDF
+     */
+    public function print(Request $request, Bpm $bpm)
+    {
+        $user = auth()->user();
+        abort_unless($bpm->canBeViewedBy($user), 403);
+
+        $bpm->load([
+            'bod',
+            'department',
+            'creator',
+            'approver',
+            'steps.raci.position',
+            'attachments',
+        ]);
+
+        if ($request->query('download') == 1) {
+            return $this->downloadPdf($bpm);
+        }
+
+        return view('bpms.print', [
+            'bpm' => $bpm,
+            'isPdf' => false,
+        ]);
     }
 
     /**

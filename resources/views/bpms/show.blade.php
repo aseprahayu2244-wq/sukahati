@@ -72,9 +72,14 @@
 
             <!-- Header Quick Actions -->
             <div class="flex flex-wrap items-center gap-2.5 shrink-0">
-                <a href="{{ route('bpms.print', $bpm->id) }}" target="_blank" class="inline-flex items-center space-x-2 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all-200 shadow-sm">
+                <a href="{{ route('bpms.download', $bpm->id) }}" class="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all-200 shadow-sm shadow-emerald-600/20">
                     <i class="fa-solid fa-file-arrow-down"></i>
-                    <span>Cetak / PDF</span>
+                    <span>Download PDF</span>
+                </a>
+
+                <a href="{{ route('bpms.print', $bpm->id) }}" target="_blank" class="inline-flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs px-4 py-2.5 rounded-xl transition-all-200">
+                    <i class="fa-solid fa-print"></i>
+                    <span>Cetak / Pratinjau</span>
                 </a>
 
                 <a href="{{ route('bpms.preview', $bpm->id) }}" class="inline-flex items-center space-x-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs px-4 py-2.5 rounded-xl transition-all-200">

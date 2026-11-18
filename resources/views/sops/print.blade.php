@@ -5,11 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $sop->nomor_dokumen }} - {{ $sop->nama_sop }}</title>
     
+    @unless($isPdf ?? false)
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Times+New+Roman&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    @endunless
 
     <style>
         @page {
@@ -247,6 +249,7 @@
 </head>
 <body>
 
+    @unless($isPdf ?? false)
     <!-- Non-Print Controls -->
     <div class="no-print-bar">
         <div>
@@ -254,12 +257,16 @@
             <span style="font-size: 11px; opacity: 0.8; margin-left: 8px;">(Format standar A4)</span>
         </div>
         <div style="display: flex; gap: 10px; align-items: center;">
-            <button onclick="window.print()" class="btn-print">
-                <i class="fa-solid fa-file-arrow-down"></i> Download PDF
+            <a href="{{ route('sops.download', $sop->id) }}" class="btn-print" style="text-decoration: none;">
+                <i class="fa-solid fa-file-arrow-down"></i> Unduh File PDF Langsung
+            </a>
+            <button onclick="window.print()" class="btn-print" style="background: #3b82f6;">
+                <i class="fa-solid fa-print"></i> Cetak / Print
             </button>
             <a href="{{ route('sops.show', $sop->id) }}" class="btn-close">Kembali</a>
         </div>
     </div>
+    @endunless
 
     <!-- Printable Paper Sheet -->
     <div class="paper-container">
@@ -268,7 +275,11 @@
         <table class="header-table">
             <tr>
                 <td class="header-logo" rowspan="2">
-                    <img src="{{ asset('images/logo-sukahati.png') }}" alt="Logo">
+                    @php
+                        $logoPath = public_path('images/logo-sukahati.png');
+                        $logoSrc = file_exists($logoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath)) : asset('images/logo-sukahati.png');
+                    @endphp
+                    <img src="{{ $logoSrc }}" alt="Logo">
                 </td>
                 <td class="header-title-box">
                     <div class="company-name">CV. SUKAHATI PRATAMA</div>
@@ -347,7 +358,14 @@
         @if($sop->flowchart)
             <div class="section-header" style="page-break-before: auto;">6. DIAGRAM ALIR (FLOWCHART)</div>
             @if($sop->flowchart->isImage())
-                <img src="{{ $sop->flowchart->preview_url }}" class="flowchart-img" alt="Flowchart">
+                @php
+                    $fcSrc = $sop->flowchart->preview_url;
+                    if ($sop->flowchart->file_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($sop->flowchart->file_path)) {
+                        $fcMime = $sop->flowchart->mime_type ?? 'image/png';
+                        $fcSrc = 'data:' . $fcMime . ';base64,' . base64_encode(\Illuminate\Support\Facades\Storage::disk('public')->get($sop->flowchart->file_path));
+                    }
+                @endphp
+                <img src="{{ $fcSrc }}" class="flowchart-img" alt="Flowchart">
             @else
                 <p style="font-size: 10pt; color: #475569; font-style: italic;">
                     * Diagram alir terlampir dalam berkas PDF: <strong>{{ $sop->flowchart->nama_file }}</strong>

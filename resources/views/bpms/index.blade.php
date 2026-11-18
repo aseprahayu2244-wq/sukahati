@@ -244,7 +244,7 @@
 
                     <div class="flex items-center space-x-2">
                         @if($bpm->isApproved())
-                            <a href="{{ route('bpms.print', $bpm->id) }}" target="_blank" title="Cetak / Download PDF" class="p-1.5 text-slate-400 hover:text-slate-700 transition-colors">
+                            <a href="{{ route('bpms.download', $bpm->id) }}" title="Download PDF" class="p-1.5 text-slate-400 hover:text-slate-700 transition-colors">
                                 <i class="fa-solid fa-file-arrow-down"></i>
                             </a>
                         @endif

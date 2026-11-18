@@ -10,6 +10,7 @@ use App\Models\SopAttachment;
 use App\Models\SopRejectionReason;
 use App\Models\SopRevisionNote;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -659,16 +660,47 @@ class SopWorkflowController extends Controller
     }
 
     /**
-     * Official Printable View of SOP Document
+     * Download SOP Document as PDF directly
      */
-    public function print(Sop $sop)
+    public function downloadPdf(Sop $sop)
     {
         $user = auth()->user();
         abort_unless($sop->canBeViewedBy($user), 403);
 
         $sop->load(['department.bod', 'creator', 'approver', 'revisionNotes', 'flowchart', 'regularAttachments']);
 
-        return view('sops.print', compact('sop'));
+        $filename = 'SOP_' . Str::slug($sop->nomor_dokumen) . '_' . Str::slug($sop->nama_sop) . '.pdf';
+
+        $pdf = Pdf::loadView('sops.print', [
+            'sop' => $sop,
+            'isPdf' => true,
+        ])->setPaper('a4', 'portrait')
+          ->setOption([
+              'isHtml5ParserEnabled' => true,
+              'isRemoteEnabled' => false,
+          ]);
+
+        return $pdf->download($filename);
+    }
+
+    /**
+     * Official Printable View of SOP Document
+     */
+    public function print(Request $request, Sop $sop)
+    {
+        $user = auth()->user();
+        abort_unless($sop->canBeViewedBy($user), 403);
+
+        $sop->load(['department.bod', 'creator', 'approver', 'revisionNotes', 'flowchart', 'regularAttachments']);
+
+        if ($request->query('download') == 1) {
+            return $this->downloadPdf($sop);
+        }
+
+        return view('sops.print', [
+            'sop' => $sop,
+            'isPdf' => false,
+        ]);
     }
 }
 

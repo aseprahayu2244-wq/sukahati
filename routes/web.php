@@ -40,6 +40,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/sops', [SopWorkflowController::class, 'store'])->name('sops.store');
     Route::get('/sops/{sop}', [SopWorkflowController::class, 'show'])->name('sops.show');
     Route::get('/sops/{sop}/print', [SopWorkflowController::class, 'print'])->name('sops.print');
+    Route::get('/sops/{sop}/download', [SopWorkflowController::class, 'downloadPdf'])->name('sops.download');
     Route::get('/sops/{sop}/edit', [SopWorkflowController::class, 'edit'])->name('sops.edit');
     Route::put('/sops/{sop}', [SopWorkflowController::class, 'update'])->name('sops.update');
     Route::delete('/sops/{sop}', [SopWorkflowController::class, 'destroy'])->name('sops.destroy');
@@ -62,6 +63,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/bpms/{bpm}', [\App\Http\Controllers\BpmWorkflowController::class, 'show'])->name('bpms.show');
     Route::get('/bpms/{bpm}/preview', [\App\Http\Controllers\BpmWorkflowController::class, 'preview'])->name('bpms.preview');
     Route::get('/bpms/{bpm}/print', [\App\Http\Controllers\BpmWorkflowController::class, 'print'])->name('bpms.print');
+    Route::get('/bpms/{bpm}/download', [\App\Http\Controllers\BpmWorkflowController::class, 'downloadPdf'])->name('bpms.download');
     Route::get('/bpms/{bpm}/edit', [\App\Http\Controllers\BpmWorkflowController::class, 'edit'])->name('bpms.edit');
     Route::put('/bpms/{bpm}', [\App\Http\Controllers\BpmWorkflowController::class, 'update'])->name('bpms.update');
     Route::delete('/bpms/{bpm}', [\App\Http\Controllers\BpmWorkflowController::class, 'destroy'])->name('bpms.destroy');

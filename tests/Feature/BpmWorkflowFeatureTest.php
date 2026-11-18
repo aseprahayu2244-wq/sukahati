@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Bod;
 use App\Models\Bpm;
 use App\Models\BpmAttachment;
+use App\Models\BpmRaci;
 use App\Models\BpmStep;
 use App\Models\Division;
 use App\Models\Notification;
@@ -100,8 +101,10 @@ class BpmWorkflowFeatureTest extends TestCase
             'created_by' => $this->admin->id,
         ]);
 
-        $this->assertDatabaseCount('bpm_steps', 3);
-        $this->assertDatabaseCount('bpm_raci', 8);
+        $createdBpm = Bpm::where('nomor_dokumen', 'BPM-HRD-001')->first();
+        $this->assertNotNull($createdBpm);
+        $this->assertCount(3, $createdBpm->steps);
+        $this->assertEquals(8, BpmRaci::whereIn('bpm_step_id', $createdBpm->steps->pluck('id'))->count());
     }
 
     /**
@@ -375,5 +378,38 @@ class BpmWorkflowFeatureTest extends TestCase
         $this->assertNotNull($bpm);
         $this->assertEquals(Bpm::SOURCE_UPLOAD, $bpm->source_type);
         $this->assertCount(1, $bpm->attachments);
+    }
+
+    /**
+     * 9. Download BPM as PDF and view printable page
+     */
+    public function test_bpm_download_pdf_and_printable_view(): void
+    {
+        $bpm = Bpm::create([
+            'nama_bpm' => 'BPM Download Test',
+            'nomor_dokumen' => 'BPM-DWN-001',
+            'bod_id' => $this->bod->id,
+            'department_id' => $this->dept->id,
+            'tanggal_efektif' => '2026-11-12',
+            'status' => Bpm::STATUS_APPROVED,
+            'source_type' => Bpm::SOURCE_BUILDER,
+            'version' => '1.0',
+            'created_by' => $this->admin->id,
+            'approved_by' => $this->superAdmin->id,
+            'approved_at' => now(),
+        ]);
+
+        // Anggota can view printable HTML page
+        $responsePrint = $this->actingAs($this->anggota)->get(route('bpms.print', $bpm->id));
+        $responsePrint->assertOk();
+        $responsePrint->assertSee('DOKUMEN RESMI BPM');
+        $responsePrint->assertSee($bpm->nomor_dokumen);
+
+        // Anggota can directly download generated PDF
+        $responsePdf = $this->actingAs($this->anggota)->get(route('bpms.download', $bpm->id));
+        $responsePdf->assertOk();
+        $this->assertStringContainsString('application/pdf', $responsePdf->headers->get('Content-Type', ''));
+        $this->assertStringContainsString('attachment', $responsePdf->headers->get('Content-Disposition', ''));
+        $this->assertStringContainsString('.pdf', $responsePdf->headers->get('Content-Disposition', ''));
     }
 }

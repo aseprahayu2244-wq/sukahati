@@ -22,9 +22,13 @@
                 <i class="fa-solid fa-arrow-left mr-1"></i>
                 <span>Kembali</span>
             </a>
-            <a href="{{ route('bpms.print', $bpm->id) }}" target="_blank" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all-200 shadow-sm shadow-indigo-600/30">
+            <a href="{{ route('bpms.download', $bpm->id) }}" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all-200 shadow-sm shadow-emerald-600/30">
+                <i class="fa-solid fa-file-arrow-down mr-1"></i>
+                <span>Download PDF</span>
+            </a>
+            <a href="{{ route('bpms.print', $bpm->id) }}" target="_blank" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all-200">
                 <i class="fa-solid fa-print mr-1"></i>
-                <span>Cetak / Download PDF</span>
+                <span>Cetak / Pratinjau</span>
             </a>
         </div>
     </div>

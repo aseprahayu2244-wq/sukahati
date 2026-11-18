@@ -382,6 +382,13 @@ class SopWorkflowFeatureTest extends TestCase
         $responsePrint->assertOk();
         $responsePrint->assertSee('STANDARD OPERATING PROCEDURE');
         $responsePrint->assertSee($sop->nomor_dokumen);
+
+        // Anggota can directly download generated PDF
+        $responsePdf = $this->actingAs($this->anggota)->get(route('sops.download', $sop->id));
+        $responsePdf->assertOk();
+        $this->assertStringContainsString('application/pdf', $responsePdf->headers->get('Content-Type', ''));
+        $this->assertStringContainsString('attachment', $responsePdf->headers->get('Content-Disposition', ''));
+        $this->assertStringContainsString('.pdf', $responsePdf->headers->get('Content-Disposition', ''));
     }
 
     /**

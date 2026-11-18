@@ -133,7 +133,7 @@
                         <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
                             <span class="text-[10px] text-slate-400">Efektif: {{ $dBpm->tanggal_efektif ? $dBpm->tanggal_efektif->format('d/m/Y') : '-' }}</span>
                             <div class="flex items-center space-x-2">
-                                <a href="{{ route('bpms.print', $dBpm->id) }}" target="_blank" title="Download PDF" class="p-1.5 text-slate-400 hover:text-slate-700">
+                                <a href="{{ route('bpms.download', $dBpm->id) }}" title="Download PDF" class="p-1.5 text-slate-400 hover:text-slate-700">
                                     <i class="fa-solid fa-file-arrow-down"></i>
                                 </a>
                                 <a href="{{ route('bpms.show', $dBpm->id) }}" class="font-bold text-indigo-600 hover:text-indigo-800 flex items-center space-x-1">
@@ -190,7 +190,7 @@
                         <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
                             <span class="text-[10px] text-slate-400">Efektif: {{ $dSop->tanggal_efektif ? $dSop->tanggal_efektif->format('d/m/Y') : '-' }}</span>
                             <div class="flex items-center space-x-2">
-                                <a href="{{ route('sops.print', $dSop->id) }}" target="_blank" title="Download PDF" class="p-1.5 text-slate-400 hover:text-slate-700">
+                                <a href="{{ route('sops.download', $dSop->id) }}" title="Download PDF" class="p-1.5 text-slate-400 hover:text-slate-700">
                                     <i class="fa-solid fa-file-arrow-down"></i>
                                 </a>
                                 <a href="{{ route('sops.show', $dSop->id) }}" class="font-bold text-blue-600 hover:text-blue-800 flex items-center space-x-1">

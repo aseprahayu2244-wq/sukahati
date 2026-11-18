@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BPM_{{ Str::slug($bpm->nomor_dokumen) }}_{{ Str::slug($bpm->nama_bpm) }}</title>
     
+    @unless($isPdf ?? false)
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    @endunless
     
     <style>
         @page {
@@ -229,22 +231,31 @@
 </head>
 <body>
 
+    @unless($isPdf ?? false)
     <!-- On screen action bar (hidden during print) -->
     <div class="no-print-bar">
         <div>
             <strong>Pratinjau Cetak / Ekspor PDF BPM</strong>
             <span style="font-size: 8.5pt; opacity: 0.8; margin-left: 8px;">Gunakan menu cetak browser atau Save as PDF.</span>
         </div>
-        <div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <a href="{{ route('bpms.download', $bpm->id) }}" class="btn-print" style="background: #10b981; text-decoration: none;">
+                Unduh File PDF Langsung
+            </a>
             <button class="btn-print" onclick="window.print()">Cetak Dokumen Sekarang</button>
         </div>
     </div>
+    @endunless
 
     <!-- Kop Surat Resmi -->
     <table class="header-table">
         <tr>
             <td style="width: 75px;">
-                <img src="{{ asset('images/logo-sukahati.png') }}" class="logo-box" alt="Logo">
+                @php
+                    $bpmLogoPath = public_path('images/logo-sukahati.png');
+                    $bpmLogoSrc = file_exists($bpmLogoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($bpmLogoPath)) : asset('images/logo-sukahati.png');
+                @endphp
+                <img src="{{ $bpmLogoSrc }}" class="logo-box" alt="Logo">
             </td>
             <td>
                 <h1 class="company-title">CV. SUKAHATI PRATAMA</h1>

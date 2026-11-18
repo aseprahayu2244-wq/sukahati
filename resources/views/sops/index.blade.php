@@ -414,7 +414,7 @@
                             <span>Buka SOP</span>
                         </a>
 
-                        <a href="{{ route('sops.print', $sop->id) }}" target="_blank" title="Download PDF" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-all-200">
+                        <a href="{{ route('sops.download', $sop->id) }}" title="Download PDF" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-all-200">
                             <i class="fa-solid fa-file-arrow-down"></i>
                         </a>
 
