@@ -15,23 +15,9 @@
         </div>
         <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div class="max-w-2xl">
-                <div class="inline-flex items-center space-x-2 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs px-3.5 py-1.5 rounded-full font-semibold mb-3 backdrop-blur-md">
-                    <i class="fa-solid fa-clipboard-check text-emerald-400"></i>
-                    <span>SOP Approval Workflow &bull; SIMA HRD</span>
-                </div>
-                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mb-2">
-                    Sistem Pengajuan & Persetujuan SOP
-                </h1>
-                <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">
-                    Kelola seluruh siklus hidup Standard Operating Procedure (SOP) secara digital: pembuatan draft, pengajuan antar-departemen, pemeriksaan berjenjang, revisi, hingga penerbitan resmi.
-                </p>
             </div>
 
             <div class="flex flex-wrap items-center gap-3">
-                <a href="{{ route('documents.index', 'sop') }}" class="inline-flex items-center space-x-2 bg-white/10 hover:bg-white/20 text-white font-semibold text-xs px-4 py-2.5 rounded-xl backdrop-blur-md transition-all-200 border border-white/10">
-                    <i class="fa-solid fa-folder-tree text-amber-400"></i>
-                    <span>Direktori Folder BOD</span>
-                </a>
 
                 @if(auth()->user()->canManageDocuments())
                 <a href="{{ route('sops.create') }}" class="inline-flex items-center space-x-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-lg shadow-emerald-500/30 transition-all-200">

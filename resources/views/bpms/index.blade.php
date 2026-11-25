@@ -15,29 +15,14 @@
         </div>
         <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div class="max-w-2xl">
-                <div class="inline-flex items-center space-x-2 bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-xs px-3.5 py-1.5 rounded-full font-semibold mb-3 backdrop-blur-md">
-                    <i class="fa-solid fa-diagram-project text-indigo-400"></i>
-                    <span>BPM Builder & Workflow &bull; SIMA HRD</span>
-                </div>
-                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mb-2">
-                    Sistem Pengelolaan Business Process Management (BPM)
-                </h1>
-                <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">
-                    Susun proses bisnis terstandarisasi dengan hierarki Level 1 (Proses Utama), Level 2 (Subproses), dan Level 3 (Aktivitas) serta matriks tanggung jawab RACI.
-                </p>
+               
+               
             </div>
 
             <div class="flex flex-wrap items-center gap-3">
-                <a href="{{ route('documents.index', 'bpm') }}" class="inline-flex items-center space-x-2 bg-white/10 hover:bg-white/20 text-white font-semibold text-xs px-4 py-2.5 rounded-xl backdrop-blur-md transition-all-200 border border-white/10">
-                    <i class="fa-solid fa-folder-tree text-amber-400"></i>
-                    <span>Direktori Folder BOD</span>
-                </a>
+               
 
                 @if(auth()->user()->canManageDocuments())
-                <a href="{{ route('bpms.create', ['mode' => 'upload']) }}" class="inline-flex items-center space-x-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg shadow-rose-600/30 transition-all-200">
-                    <i class="fa-solid fa-cloud-arrow-up"></i>
-                    <span>Upload BPM</span>
-                </a>
                 <a href="{{ route('bpms.create', ['mode' => 'builder']) }}" class="inline-flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-lg shadow-indigo-600/30 transition-all-200">
                     <i class="fa-solid fa-wand-magic-sparkles"></i>
                     <span>BPM Builder</span>

@@ -129,7 +129,7 @@ class BpmWorkflowController extends Controller
         $selectedDepartmentId = $request->get('department_id');
         $departments = Division::with('bod')->orderBy('name')->get();
         $bods = Bod::orderBy('order')->get();
-        $positions = Position::orderBy('name')->get();
+        $positions = Position::with('division')->orderBy('name')->get();
 
         return view('bpms.create', compact('mode', 'departments', 'bods', 'positions', 'selectedDepartmentId'));
     }
@@ -424,7 +424,7 @@ class BpmWorkflowController extends Controller
 
         $departments = Division::with('bod')->orderBy('name')->get();
         $bods = Bod::orderBy('order')->get();
-        $positions = Position::orderBy('name')->get();
+        $positions = Position::with('division')->orderBy('name')->get();
 
         return view('bpms.edit', compact('bpm', 'departments', 'bods', 'positions'));
     }
@@ -750,53 +750,15 @@ class BpmWorkflowController extends Controller
                 'parent_id'            => null,
             ]);
 
-            // Save RACI
-            // R: Responsible (array of position IDs)
-            if (!empty($stepData['raci_r']) && is_array($stepData['raci_r'])) {
-                foreach ($stepData['raci_r'] as $posId) {
+            // Save RACI (supports both single dropdown value and array of position IDs)
+            foreach (['raci_r' => 'R', 'raci_a' => 'A', 'raci_c' => 'C', 'raci_i' => 'I'] as $field => $type) {
+                $posIds = (array) ($stepData[$field] ?? []);
+                foreach ($posIds as $posId) {
                     if (!empty($posId)) {
                         BpmRaci::create([
                             'bpm_step_id'         => $step->id,
-                            'responsibility_type' => 'R',
-                            'position_id'         => (int)$posId,
-                        ]);
-                    }
-                }
-            }
-
-            // A: Accountable (single position ID default)
-            if (!empty($stepData['raci_a'])) {
-                $posId = is_array($stepData['raci_a']) ? ($stepData['raci_a'][0] ?? null) : $stepData['raci_a'];
-                if (!empty($posId)) {
-                    BpmRaci::create([
-                        'bpm_step_id'         => $step->id,
-                        'responsibility_type' => 'A',
-                        'position_id'         => (int)$posId,
-                    ]);
-                }
-            }
-
-            // C: Consulted (array of position IDs)
-            if (!empty($stepData['raci_c']) && is_array($stepData['raci_c'])) {
-                foreach ($stepData['raci_c'] as $posId) {
-                    if (!empty($posId)) {
-                        BpmRaci::create([
-                            'bpm_step_id'         => $step->id,
-                            'responsibility_type' => 'C',
-                            'position_id'         => (int)$posId,
-                        ]);
-                    }
-                }
-            }
-
-            // I: Informed (array of position IDs)
-            if (!empty($stepData['raci_i']) && is_array($stepData['raci_i'])) {
-                foreach ($stepData['raci_i'] as $posId) {
-                    if (!empty($posId)) {
-                        BpmRaci::create([
-                            'bpm_step_id'         => $step->id,
-                            'responsibility_type' => 'I',
-                            'position_id'         => (int)$posId,
+                            'responsibility_type' => $type,
+                            'position_id'         => (int) $posId,
                         ]);
                     }
                 }

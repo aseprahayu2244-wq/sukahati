@@ -1,4 +1,4 @@
-﻿<x-app-layout>
+<x-app-layout>
     <x-slot name="headerTitle">Pembuatan Dokumen BPM</x-slot>
     <x-slot name="breadcrumb">
         <a href="{{ route('dashboard') }}" class="hover:underline">Beranda</a>
@@ -11,8 +11,7 @@
     <!-- Top Info -->
     <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Formulir BPM Baru</h1>
-            <p class="text-xs sm:text-sm text-slate-500 mt-1">Pilih metode pembuatan: gunakan <strong>BPM Builder</strong> untuk menyusun hierarki L1-L3 & RACI interaktif, atau <strong>Upload Berkas</strong> untuk mengunggah dokumen PDF/Gambar.</p>
+     
         </div>
         <a href="{{ route('bpms.index') }}" class="inline-flex items-center space-x-2 text-xs font-semibold px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-all-200 self-start md:self-auto">
             <i class="fa-solid fa-arrow-left"></i>
@@ -39,29 +38,10 @@
     <form id="bpmForm" method="POST" action="{{ route('bpms.store') }}" enctype="multipart/form-data" class="space-y-8">
         @csrf
         <input type="hidden" name="action" id="formActionInput" value="submit">
+        <input type="hidden" name="source_type" id="sourceTypeInput" value="{{ old('source_type', $mode) === 'upload' ? 'upload' : 'builder' }}">
 
         <!-- Method Switcher Tab (Builder vs Upload) -->
-        <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div class="flex items-center space-x-2">
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Metode Dokumen:</span>
-            </div>
-            <div class="inline-flex rounded-xl p-1 bg-slate-100 border border-slate-200 text-xs font-bold">
-                <label class="cursor-pointer">
-                    <input type="radio" name="source_type" value="builder" {{ old('source_type', $mode) === 'builder' ? 'checked' : '' }} onchange="toggleSourceType('builder')" class="sr-only peer">
-                    <span class="inline-flex items-center space-x-2 px-4 py-2 rounded-lg peer-checked:bg-white peer-checked:text-indigo-600 peer-checked:shadow-sm text-slate-600 transition-all-200">
-                        <i class="fa-solid fa-wand-magic-sparkles text-indigo-500"></i>
-                        <span>BPM Builder (L1-L3 & RACI)</span>
-                    </span>
-                </label>
-                <label class="cursor-pointer">
-                    <input type="radio" name="source_type" value="upload" {{ old('source_type', $mode) === 'upload' ? 'checked' : '' }} onchange="toggleSourceType('upload')" class="sr-only peer">
-                    <span class="inline-flex items-center space-x-2 px-4 py-2 rounded-lg peer-checked:bg-white peer-checked:text-rose-600 peer-checked:shadow-sm text-slate-600 transition-all-200">
-                        <i class="fa-solid fa-cloud-arrow-up text-rose-500"></i>
-                        <span>Upload File Dokumen</span>
-                    </span>
-                </label>
-            </div>
-        </div>
+      
 
         <!-- ========================================================= -->
         <!-- BAGIAN 1: INFORMASI UMUM BPM -->
@@ -129,7 +109,7 @@
                     <label for="department_id" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
                         Departemen <span class="text-rose-500">*</span>
                     </label>
-                    <select id="department_id" name="department_id" required 
+                    <select id="department_id" name="department_id" required onchange="onDepartmentChange(this.value)"
                             class="w-full bg-slate-50 text-slate-900 text-sm rounded-xl px-4 py-3 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                         <option value="">-- Pilih Departemen --</option>
                         @foreach($departments as $dept)
@@ -275,9 +255,25 @@
     </form>
 
     <!-- JavaScript Data and Controller for BPM Builder -->
+    @php
+        $departmentsJson = $departments->map(fn($d) => [
+            'id' => $d->id,
+            'name' => $d->name,
+            'bod_id' => $d->bod_id,
+            'bod_name' => $d->bod?->name,
+        ])->values();
+
+        $positionsJson = $positions->map(fn($p) => [
+            'id' => $p->id,
+            'name' => $p->name,
+            'division_id' => $p->division_id,
+            'division_name' => $p->division?->name,
+        ])->values();
+    @endphp
     <script>
+        const allDepartments = @json($departmentsJson);
         // Available positions from backend for RACI dropdowns
-        const availablePositions = @json($positions);
+        const availablePositions = @json($positionsJson);
 
         let stepIndex = 0;
 
@@ -293,16 +289,108 @@
             }
         }
 
-        function onBodChange(bodId) {
+        function onBodChange(bodId, preserveDeptId = null) {
             const deptSelect = document.getElementById('department_id');
-            const options = deptSelect.querySelectorAll('option[data-bod]');
-            
-            options.forEach(opt => {
-                if (!bodId || opt.getAttribute('data-bod') === bodId) {
-                    opt.style.display = '';
-                } else {
-                    opt.style.display = 'none';
+            const currentVal = preserveDeptId !== null ? String(preserveDeptId) : String(deptSelect.value || '');
+
+            const filtered = bodId
+                ? allDepartments.filter(d => String(d.bod_id) === String(bodId))
+                : allDepartments;
+
+            deptSelect.innerHTML = '';
+            const defaultOpt = document.createElement('option');
+            defaultOpt.value = '';
+            defaultOpt.textContent = bodId && filtered.length === 0
+                ? '-- Tidak ada departemen di BOD ini --'
+                : '-- Pilih Departemen --';
+            deptSelect.appendChild(defaultOpt);
+
+            let stillValid = false;
+            filtered.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d.id;
+                opt.setAttribute('data-bod', d.bod_id || '');
+                opt.textContent = d.bod_name && !bodId ? `${d.name} (${d.bod_name})` : d.name;
+                if (String(d.id) === currentVal) {
+                    opt.selected = true;
+                    stillValid = true;
                 }
+                deptSelect.appendChild(opt);
+            });
+
+            if (!stillValid) {
+                deptSelect.value = '';
+            }
+            refreshAllRaciDropdowns();
+        }
+
+        function onDepartmentChange(deptId) {
+            const bodSelect = document.getElementById('bod_id');
+            if (deptId && bodSelect && !bodSelect.value) {
+                const dept = allDepartments.find(d => String(d.id) === String(deptId));
+                if (dept && dept.bod_id) {
+                    bodSelect.value = dept.bod_id;
+                    onBodChange(dept.bod_id, deptId);
+                    return;
+                }
+            }
+            refreshAllRaciDropdowns();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text ?? '';
+            return div.innerHTML;
+        }
+
+        function buildPositionOptionsHtml(selectedValues = [], includePlaceholder = false) {
+            const selectedSet = new Set((Array.isArray(selectedValues) ? selectedValues : [selectedValues]).map(v => String(v)));
+            const deptId = document.getElementById('department_id')?.value || '';
+
+            let html = includePlaceholder ? '<option value="">-- Pilih Jabatan --</option>' : '';
+
+            if (availablePositions.length === 0) {
+                return html + '<option value="" disabled>-- Belum ada data jabatan --</option>';
+            }
+
+            if (deptId) {
+                const deptPositions = availablePositions.filter(p => String(p.division_id) === String(deptId));
+                const otherPositions = availablePositions.filter(p => String(p.division_id) !== String(deptId));
+
+                if (deptPositions.length > 0) {
+                    html += '<optgroup label="Jabatan Departemen Terpilih">';
+                    deptPositions.forEach(p => {
+                        const sel = selectedSet.has(String(p.id)) ? 'selected' : '';
+                        html += `<option value="${p.id}" ${sel}>${escapeHtml(p.name)}</option>`;
+                    });
+                    html += '</optgroup>';
+                }
+
+                if (otherPositions.length > 0) {
+                    html += '<optgroup label="Jabatan Departemen Lain">';
+                    otherPositions.forEach(p => {
+                        const sel = selectedSet.has(String(p.id)) ? 'selected' : '';
+                        const label = p.division_name ? `${p.name} (${p.division_name})` : p.name;
+                        html += `<option value="${p.id}" ${sel}>${escapeHtml(label)}</option>`;
+                    });
+                    html += '</optgroup>';
+                }
+            } else {
+                availablePositions.forEach(p => {
+                    const sel = selectedSet.has(String(p.id)) ? 'selected' : '';
+                    const label = p.division_name ? `${p.name} (${p.division_name})` : p.name;
+                    html += `<option value="${p.id}" ${sel}>${escapeHtml(label)}</option>`;
+                });
+            }
+
+            return html;
+        }
+
+        function refreshAllRaciDropdowns() {
+            document.querySelectorAll('#builderCardsContainer select.raci-select').forEach(select => {
+                const isSingle = !select.multiple;
+                const selected = Array.from(select.selectedOptions).map(o => o.value).filter(v => v !== '');
+                select.innerHTML = buildPositionOptionsHtml(selected, isSingle);
             });
         }
 
@@ -330,11 +418,15 @@
 
             const arrowIcon = level === 'L2' ? '↳ ' : (level === 'L3' ? '↳ ↳ ' : '');
 
-            // Build Options HTML
-            let posOptionsHtml = '';
-            availablePositions.forEach(p => {
-                posOptionsHtml += `<option value="${p.id}">${p.name}</option>`;
-            });
+            const selectedR = initialData.raci_r || [];
+            const selectedA = initialData.raci_a || '';
+            const selectedC = initialData.raci_c || [];
+            const selectedI = initialData.raci_i || [];
+
+            const posOptionsR = buildPositionOptionsHtml(selectedR, true);
+            const posOptionsA = buildPositionOptionsHtml(selectedA ? [selectedA] : [], true);
+            const posOptionsC = buildPositionOptionsHtml(selectedC, true);
+            const posOptionsI = buildPositionOptionsHtml(selectedI, true);
 
             const card = document.createElement('div');
             card.id = id;
@@ -381,7 +473,6 @@
                             <i class="fa-solid fa-users-gear text-indigo-500"></i>
                             <span>Tanggung Jawab RACI untuk aktivitas ini:</span>
                         </span>
-                        <span class="text-[10px] text-slate-400 hidden sm:inline">* Tahan Ctrl/Cmd untuk memilih beberapa jabatan</span>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -391,8 +482,8 @@
                                 <span>Responsible (R)</span>
                                 <span class="text-[9px] px-1.5 py-0.2 rounded bg-indigo-50 text-indigo-600 font-bold">Pelaksana</span>
                             </label>
-                            <select name="steps[${currentIndex}][raci_r][]" multiple size="2" class="w-full bg-slate-50 text-slate-900 text-xs rounded-lg p-1.5 border border-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500">
-                                ${posOptionsHtml}
+                            <select name="steps[${currentIndex}][raci_r][]" class="raci-select w-full bg-slate-50 text-slate-900 text-xs rounded-lg p-2 border border-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                                ${posOptionsR}
                             </select>
                         </div>
 
@@ -402,9 +493,8 @@
                                 <span>Accountable (A)</span>
                                 <span class="text-[9px] px-1.5 py-0.2 rounded bg-amber-50 text-amber-700 font-bold">Penanggung Jawab</span>
                             </label>
-                            <select name="steps[${currentIndex}][raci_a]" class="w-full bg-slate-50 text-slate-900 text-xs rounded-lg p-2 border border-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500">
-                                <option value="">-- Pilih Jabatan --</option>
-                                ${posOptionsHtml}
+                            <select name="steps[${currentIndex}][raci_a]" class="raci-select w-full bg-slate-50 text-slate-900 text-xs rounded-lg p-2 border border-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500">
+                                ${posOptionsA}
                             </select>
                         </div>
 
@@ -414,8 +504,8 @@
                                 <span>Consulted (C)</span>
                                 <span class="text-[9px] px-1.5 py-0.2 rounded bg-sky-50 text-sky-600 font-bold">Konsultasi</span>
                             </label>
-                            <select name="steps[${currentIndex}][raci_c][]" multiple size="2" class="w-full bg-slate-50 text-slate-900 text-xs rounded-lg p-1.5 border border-slate-200 focus:outline-none focus:ring-1 focus:ring-sky-500">
-                                ${posOptionsHtml}
+                            <select name="steps[${currentIndex}][raci_c][]" class="raci-select w-full bg-slate-50 text-slate-900 text-xs rounded-lg p-2 border border-slate-200 focus:outline-none focus:ring-1 focus:ring-sky-500">
+                                ${posOptionsC}
                             </select>
                         </div>
 
@@ -425,8 +515,8 @@
                                 <span>Informed (I)</span>
                                 <span class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-600 font-bold">Informasi</span>
                             </label>
-                            <select name="steps[${currentIndex}][raci_i][]" multiple size="2" class="w-full bg-slate-50 text-slate-900 text-xs rounded-lg p-1.5 border border-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500">
-                                ${posOptionsHtml}
+                            <select name="steps[${currentIndex}][raci_i][]" class="raci-select w-full bg-slate-50 text-slate-900 text-xs rounded-lg p-2 border border-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                                ${posOptionsI}
                             </select>
                         </div>
                     </div>
@@ -550,7 +640,7 @@
                 return;
             }
 
-            const sourceType = document.querySelector('input[name="source_type"]:checked')?.value || 'builder';
+            const sourceType = document.getElementById('sourceTypeInput')?.value || 'builder';
             if (sourceType === 'builder') {
                 const rows = document.querySelectorAll('#builderCardsContainer .step-row');
                 if (rows.length === 0) {
@@ -596,8 +686,13 @@
             });
         }
 
-        // Initialize with default L1 row on page load
+        // Initialize with default L1 row on page load and sync BOD -> Departemen
         document.addEventListener('DOMContentLoaded', function() {
+            const bodSelect = document.getElementById('bod_id');
+            const deptSelect = document.getElementById('department_id');
+            if (bodSelect && bodSelect.value) {
+                onBodChange(bodSelect.value, deptSelect ? deptSelect.value : null);
+            }
             addStepRow('L1');
         });
     </script>

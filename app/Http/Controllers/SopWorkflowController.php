@@ -615,7 +615,7 @@ class SopWorkflowController extends Controller
     {
         $user = auth()->user();
         abort_unless($sop->canBeViewedBy($user), 403);
-        abort_unless($attachment->sop_id === $sop->id, 404);
+        abort_unless((int) $attachment->sop_id === (int) $sop->id, 404);
 
         if (!Storage::disk('public')->exists($attachment->file_path)) {
             abort(404, 'File lampiran tidak ditemukan pada server.');
@@ -631,7 +631,7 @@ class SopWorkflowController extends Controller
     {
         $user = auth()->user();
         abort_unless($sop->canBeViewedBy($user), 403);
-        abort_unless($attachment->sop_id === $sop->id, 404);
+        abort_unless((int) $attachment->sop_id === (int) $sop->id, 404);
 
         if (!Storage::disk('public')->exists($attachment->file_path)) {
             abort(404, 'File tidak ditemukan.');
@@ -640,7 +640,7 @@ class SopWorkflowController extends Controller
         $fullPath = Storage::disk('public')->path($attachment->file_path);
         return response()->file($fullPath, [
             'Content-Type' => $attachment->mime_type ?? mime_content_type($fullPath),
-            'Content-Disposition' => 'inline; filename="' . $attachment->nama_file . '"',
+            'Content-Disposition' => 'inline; filename="' . addslashes($attachment->nama_file) . '"',
         ]);
     }
 
@@ -651,7 +651,7 @@ class SopWorkflowController extends Controller
     {
         $user = auth()->user();
         abort_unless($sop->canBeEditedBy($user), 403);
-        abort_unless($attachment->sop_id === $sop->id, 404);
+        abort_unless((int) $attachment->sop_id === (int) $sop->id, 404);
 
         Storage::disk('public')->delete($attachment->file_path);
         $attachment->delete();
@@ -678,7 +678,16 @@ class SopWorkflowController extends Controller
           ->setOption([
               'isHtml5ParserEnabled' => true,
               'isRemoteEnabled' => false,
+              'defaultFont' => 'Times-Roman',
+              'isFontSubsettingEnabled' => true,
+              'defaultPaperSize' => 'a4',
           ]);
+
+        $pdf->output();
+        $canvas = $pdf->getCanvas();
+        $font = $pdf->getFontMetrics()->getFont('Times-Roman', 'normal');
+        $canvas->page_text(35, 815, 'SIMA HRD - CV. Sukahati Pratama | ' . $sop->nomor_dokumen . ' (Rev. ' . $sop->version . ')', $font, 8, [0.3, 0.3, 0.3]);
+        $canvas->page_text(490, 815, 'Halaman {PAGE_NUM} dari {PAGE_COUNT}', $font, 8, [0.3, 0.3, 0.3]);
 
         return $pdf->download($filename);
     }

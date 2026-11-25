@@ -11,8 +11,7 @@
     <!-- Top Info -->
     <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Formulir SOP Digital</h1>
-            <p class="text-xs sm:text-sm text-slate-500 mt-1">Lengkapi data informasi umum, klausul SOP, diagram alir flowchart, dan berkas lampiran pendukung.</p>
+            <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Formulir Pengajuan SOP</h1>
         </div>
         <a href="{{ route('sops.index') }}" class="inline-flex items-center space-x-2 text-xs font-semibold px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-all-200 self-start md:self-auto">
             <i class="fa-solid fa-arrow-left"></i>
@@ -41,38 +40,7 @@
         <input type="hidden" name="action" id="formActionInput" value="submit">
 
         <!-- Progress Steps Indicator -->
-        <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
-                <a href="#sectionA" class="flex items-center space-x-3 p-3 rounded-xl bg-blue-50/80 border border-blue-200 text-blue-900 font-bold transition-all-200">
-                    <div class="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-sm shrink-0">1</div>
-                    <div>
-                        <p class="leading-none text-[11px] text-blue-600 uppercase font-semibold">Bagian A</p>
-                        <p class="mt-0.5 truncate font-bold">Informasi Umum</p>
-                    </div>
-                </a>
-                <a href="#sectionB" class="flex items-center space-x-3 p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100 transition-all-200">
-                    <div class="w-8 h-8 rounded-lg bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-sm shrink-0">2</div>
-                    <div>
-                        <p class="leading-none text-[11px] text-slate-400 uppercase font-semibold">Bagian B</p>
-                        <p class="mt-0.5 truncate font-bold">Isi Dokumen SOP</p>
-                    </div>
-                </a>
-                <a href="#sectionC" class="flex items-center space-x-3 p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100 transition-all-200">
-                    <div class="w-8 h-8 rounded-lg bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-sm shrink-0">3</div>
-                    <div>
-                        <p class="leading-none text-[11px] text-slate-400 uppercase font-semibold">Bagian C</p>
-                        <p class="mt-0.5 truncate font-bold">Flowchart</p>
-                    </div>
-                </a>
-                <a href="#sectionD" class="flex items-center space-x-3 p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100 transition-all-200">
-                    <div class="w-8 h-8 rounded-lg bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-sm shrink-0">4</div>
-                    <div>
-                        <p class="leading-none text-[11px] text-slate-400 uppercase font-semibold">Bagian D</p>
-                        <p class="mt-0.5 truncate font-bold">Lampiran Berkas</p>
-                    </div>
-                </a>
-            </div>
-        </div>
+  
 
         <!-- ========================================================= -->
         <!-- BAGIAN A: INFORMASI UMUM SOP -->

@@ -373,9 +373,29 @@ class SopWorkflowFeatureTest extends TestCase
             'uploaded_by' => $this->admin->id,
         ]);
 
-        // Anggota can download attachment of approved SOP
-        $responseDownload = $this->actingAs($this->anggota)->get(route('sops.attachments.download', [$sop->id, $attRecord->id]));
-        $responseDownload->assertOk();
+        $flowchartImg = UploadedFile::fake()->image('flowchart_test.png');
+        $flowchartRecord = $sop->attachments()->create([
+            'jenis_file' => 'flowchart',
+            'nama_file' => 'flowchart_test.png',
+            'file_path' => $flowchartImg->storeAs('sops/' . $sop->id . '/flowchart', 'flowchart_test.png', 'public'),
+            'mime_type' => 'image/png',
+            'file_size' => 12000,
+            'uploaded_by' => $this->admin->id,
+        ]);
+
+        // Anggota can view SOP detail with valid attachment & flowchart URLs
+        $responseShow = $this->actingAs($this->anggota)->get(route('sops.show', $sop->id));
+        $responseShow->assertOk();
+        $responseShow->assertSee($attRecord->url, false);
+        $responseShow->assertSee($attRecord->preview_url, false);
+        $responseShow->assertSee($flowchartRecord->url, false);
+        $responseShow->assertSee($flowchartRecord->preview_url, false);
+
+        // Anggota can preview and download attachment & flowchart of approved SOP
+        $this->actingAs($this->anggota)->get($attRecord->url)->assertOk();
+        $this->actingAs($this->anggota)->get($attRecord->preview_url)->assertOk();
+        $this->actingAs($this->anggota)->get($flowchartRecord->url)->assertOk();
+        $this->actingAs($this->anggota)->get($flowchartRecord->preview_url)->assertOk();
 
         // Anggota can view printable official SOP page
         $responsePrint = $this->actingAs($this->anggota)->get(route('sops.print', $sop->id));

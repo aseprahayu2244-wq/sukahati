@@ -116,12 +116,17 @@
         .raci-table {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed;
             margin-bottom: 15px;
             page-break-inside: auto;
         }
 
+        .raci-table thead {
+            display: table-header-group;
+        }
+
         .raci-table tr {
-            page-break-inside: avoid;
+            page-break-inside: auto;
             page-break-after: auto;
         }
 
@@ -139,7 +144,9 @@
             border: 1px solid #cbd5e1;
             padding: 6px 8px;
             font-size: 9pt;
-            vertical-align: middle;
+            vertical-align: top;
+            word-wrap: break-word;
+            overflow-wrap: anywhere;
         }
 
         .level-tag {
@@ -305,11 +312,11 @@
         <table class="raci-table">
             <thead>
                 <tr>
-                    <th style="text-align: left; width: 44%;">Level & Uraian Aktivitas</th>
-                    <th style="width: 14%;">Responsible (R)</th>
-                    <th style="width: 14%;">Accountable (A)</th>
-                    <th style="width: 14%;">Consulted (C)</th>
-                    <th style="width: 14%;">Informed (I)</th>
+                    <th style="text-align: left; width: 56%;">Level &amp; Uraian Aktivitas</th>
+                    <th style="width: 11%; padding: 5px 2px; font-size: 6.5pt; letter-spacing: 0;">Responsible<br>(R)</th>
+                    <th style="width: 11%; padding: 5px 2px; font-size: 6.5pt; letter-spacing: 0;">Accountable<br>(A)</th>
+                    <th style="width: 11%; padding: 5px 2px; font-size: 6.5pt; letter-spacing: 0;">Consulted<br>(C)</th>
+                    <th style="width: 11%; padding: 5px 2px; font-size: 6.5pt; letter-spacing: 0;">Informed<br>(I)</th>
                 </tr>
             </thead>
             <tbody>
@@ -327,26 +334,56 @@
                             'L3' => '↳ ↳ ',
                             default => '',
                         };
+                        $rawLines = preg_split('/\r\n|\r|\n/', trim((string) $step->activity_description));
+                        $lines = [];
+                        foreach ($rawLines as $rawLine) {
+                            $trimmed = trim($rawLine);
+                            if ($trimmed === '') {
+                                continue;
+                            }
+                            if (($isPdf ?? false) && mb_strlen($trimmed) > 350) {
+                                foreach (explode("\n", wordwrap($trimmed, 350, "\n", true)) as $chunk) {
+                                    $lines[] = $chunk;
+                                }
+                            } else {
+                                $lines[] = $trimmed;
+                            }
+                        }
+                        if (empty($lines)) {
+                            $lines = [''];
+                        }
+                        $totalLines = count($lines);
                     @endphp
-                    <tr class="{{ $step->level === 'L1' ? 'row-l1' : '' }}">
-                        <td class="{{ $indentClass }}">
-                            <span style="color: #94a3b8; font-family: monospace;">{{ $arrow }}</span>
-                            <span class="level-tag level-{{ $step->level }}">{{ $step->level }}</span>
-                            {{ $step->activity_description }}
-                        </td>
-                        <td style="text-align: center; font-size: 8.5pt;">
-                            {{ $step->responsible->pluck('position.name')->join(', ') ?: '-' }}
-                        </td>
-                        <td style="text-align: center; font-size: 8.5pt; font-weight: bold;">
-                            {{ $step->accountable->pluck('position.name')->join(', ') ?: '-' }}
-                        </td>
-                        <td style="text-align: center; font-size: 8.5pt;">
-                            {{ $step->consulted->pluck('position.name')->join(', ') ?: '-' }}
-                        </td>
-                        <td style="text-align: center; font-size: 8.5pt;">
-                            {{ $step->informed->pluck('position.name')->join(', ') ?: '-' }}
-                        </td>
-                    </tr>
+                    @foreach($lines as $lineIdx => $lineText)
+                        @php
+                            $isFirst = $lineIdx === 0;
+                            $isLast = $lineIdx === ($totalLines - 1);
+                            $cellBorderStyle = ($totalLines > 1)
+                                ? ($isFirst ? 'border-bottom: none; padding-bottom: 2px;' : ($isLast ? 'border-top: none; padding-top: 2px;' : 'border-top: none; border-bottom: none; padding-top: 2px; padding-bottom: 2px;'))
+                                : '';
+                        @endphp
+                        <tr class="{{ $step->level === 'L1' ? 'row-l1' : '' }}">
+                            <td class="{{ $indentClass }}" style="{{ $cellBorderStyle }}">
+                                @if($isFirst)
+                                    <span style="color: #94a3b8; font-family: monospace;">{{ $arrow }}</span>
+                                    <span class="level-tag level-{{ $step->level }}">{{ $step->level }}</span>
+                                @endif
+                                {{ $lineText }}
+                            </td>
+                            <td style="text-align: center; font-size: 8pt; padding: 4px 3px; {{ $cellBorderStyle }}">
+                                {{ $isFirst ? ($step->responsible->pluck('position.name')->join(', ') ?: '-') : '' }}
+                            </td>
+                            <td style="text-align: center; font-size: 8pt; padding: 4px 3px; font-weight: bold; {{ $cellBorderStyle }}">
+                                {{ $isFirst ? ($step->accountable->pluck('position.name')->join(', ') ?: '-') : '' }}
+                            </td>
+                            <td style="text-align: center; font-size: 8pt; padding: 4px 3px; {{ $cellBorderStyle }}">
+                                {{ $isFirst ? ($step->consulted->pluck('position.name')->join(', ') ?: '-') : '' }}
+                            </td>
+                            <td style="text-align: center; font-size: 8pt; padding: 4px 3px; {{ $cellBorderStyle }}">
+                                {{ $isFirst ? ($step->informed->pluck('position.name')->join(', ') ?: '-') : '' }}
+                            </td>
+                        </tr>
+                    @endforeach
                 @empty
                     <tr>
                         <td colspan="5" style="text-align: center; color: #94a3b8; padding: 20px;">

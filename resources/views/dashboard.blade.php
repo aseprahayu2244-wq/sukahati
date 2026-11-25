@@ -12,43 +12,10 @@
             <i class="fa-solid fa-folder-tree text-9xl"></i>
         </div>
         <div class="relative z-10 max-w-3xl">
-            <div class="inline-flex items-center space-x-2 bg-blue-500/20 text-blue-300 border border-blue-500/30 text-xs px-3.5 py-1.5 rounded-full font-semibold mb-4 backdrop-blur-md">
-                <i class="fa-solid fa-shield-halved text-amber-400"></i>
-                <span>Role: {{ auth()->user()->getRoleLabel() }} &bull; {{ auth()->user()->isSuperAdmin() ? 'Akses Penuh Sistem' : (auth()->user()->isAdmin() ? 'Pengelola Dokumen & Departemen' : 'Akses Dokumen (View & Download)') }}</span>
-            </div>
+           
             <h1 class="text-3xl font-extrabold tracking-tight text-white mb-2">Selamat Datang, {{ auth()->user()->name }}! 👋</h1>
-            <p class="text-slate-300 text-sm leading-relaxed">
-                Sistem Informasi Manajemen Arsip HRD memudahkan pengelolaan dokumen SOP, Job Desk, BPM, dan Struktur Organisasi dengan terstruktur berbasis hirarki BOD, Departemen, dan Jabatan.
-            </p>
-            @if(auth()->user()->canManageDocuments())
-                <div class="mt-6 flex flex-wrap items-center gap-3">
-                    <a href="{{ route('sops.create') }}" class="inline-flex items-center space-x-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg shadow-emerald-500/30 transition-all-200">
-                        <i class="fa-solid fa-file-signature"></i>
-                        <span>Buat / Ajukan SOP</span>
-                    </a>
-                    <a href="{{ route('sops.index') }}" class="inline-flex items-center space-x-2 bg-white/10 hover:bg-white/20 text-white font-semibold text-xs px-4 py-2.5 rounded-xl backdrop-blur-md transition-all-200">
-                        <i class="fa-solid fa-clipboard-check text-amber-400"></i>
-                        <span>Workflow SOP</span>
-                        @if(auth()->user()->isSuperAdmin() && ($globalPendingSopCount ?? 0) > 0)
-                            <span class="bg-amber-500 text-slate-900 text-[10px] px-1.5 py-0.5 rounded-full font-bold ml-1">{{ $globalPendingSopCount }}</span>
-                        @endif
-                    </a>
-                    <a href="{{ route('documents.create') }}" class="inline-flex items-center space-x-2 bg-white/10 hover:bg-white/20 text-white font-semibold text-xs px-4 py-2.5 rounded-xl backdrop-blur-md transition-all-200">
-                        <i class="fa-solid fa-cloud-arrow-up"></i>
-                        <span>Upload Berkas Arsip</span>
-                    </a>
-                    @if(auth()->user()->isSuperAdmin())
-                        <a href="{{ route('admin.bods.index') }}" class="inline-flex items-center space-x-2 bg-white/10 hover:bg-white/20 text-white font-semibold text-xs px-4 py-2.5 rounded-xl backdrop-blur-md transition-all-200">
-                            <i class="fa-solid fa-building-user"></i>
-                            <span>Kelola BOD</span>
-                        </a>
-                        <a href="{{ route('admin.users.index') }}" class="inline-flex items-center space-x-2 bg-white/10 hover:bg-white/20 text-white font-semibold text-xs px-4 py-2.5 rounded-xl backdrop-blur-md transition-all-200">
-                            <i class="fa-solid fa-users-gear"></i>
-                            <span>Kelola Pengguna</span>
-                        </a>
-                    @endif
-                </div>
-            @endif
+        
+            
         </div>
     </div>
 

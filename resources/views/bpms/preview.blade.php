@@ -94,14 +94,14 @@
                 </h3>
 
                 <div class="border border-slate-300 rounded-lg overflow-hidden">
-                    <table class="w-full text-left text-xs border-collapse">
+                    <table class="w-full text-left text-xs border-collapse table-fixed">
                         <thead class="bg-slate-100 text-slate-800 font-extrabold uppercase text-[10px] border-b border-slate-300">
                             <tr>
-                                <th class="py-2.5 px-3 border-r border-slate-300 min-w-[280px]">Uraian Aktivitas (Hierarki L1-L3)</th>
-                                <th class="py-2.5 px-3 border-r border-slate-300 w-36 text-center">Responsible (R)</th>
-                                <th class="py-2.5 px-3 border-r border-slate-300 w-36 text-center">Accountable (A)</th>
-                                <th class="py-2.5 px-3 border-r border-slate-300 w-36 text-center">Consulted (C)</th>
-                                <th class="py-2.5 px-3 w-36 text-center">Informed (I)</th>
+                                <th class="py-2.5 px-3 border-r border-slate-300 w-[56%]">Uraian Aktivitas (Hierarki L1-L3)</th>
+                                <th class="py-2.5 px-1.5 border-r border-slate-300 w-[11%] text-center">Responsible (R)</th>
+                                <th class="py-2.5 px-1.5 border-r border-slate-300 w-[11%] text-center">Accountable (A)</th>
+                                <th class="py-2.5 px-1.5 border-r border-slate-300 w-[11%] text-center">Consulted (C)</th>
+                                <th class="py-2.5 px-1.5 w-[11%] text-center">Informed (I)</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-200">

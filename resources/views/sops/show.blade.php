@@ -1,4 +1,4 @@
-<x-app-layout>
+ <x-app-layout>
     <x-slot name="headerTitle">{{ $sop->nama_sop }}</x-slot>
     <x-slot name="breadcrumb">
         <a href="{{ route('dashboard') }}" class="hover:underline">Beranda</a>
@@ -19,7 +19,7 @@
     <!-- Header Card -->
     <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm mb-8 relative overflow-hidden">
         <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-6">
-            <div class="flex-1">
+            <div class="flex-1 min-w-0">
                 <div class="flex flex-wrap items-center gap-2 mb-3">
                     <span class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-bold {{ $sop->getStatusBadgeClass() }}">
                         <i class="fa-solid {{ $sop->getStatusIcon() }} text-[11px]"></i>
@@ -40,7 +40,7 @@
                     @endif
                 </div>
 
-                <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-2 break-words text-break-anywhere">
                     {{ $sop->nama_sop }}
                 </h1>
                 
@@ -172,48 +172,48 @@
         </form>
     @endif
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="sop-grid grid grid-cols-1 lg:grid-cols-3 gap-8 items-start" style="grid-template-columns: minmax(0,2fr) minmax(0,1fr);">
         
         <!-- Left 2 Cols: Main SOP Clauses & Flowchart -->
-        <div class="lg:col-span-2 space-y-8">
+        <div class="space-y-8" style="min-width:0; overflow:hidden; word-break:break-word;">
             
             <!-- 1. TUJUAN -->
-            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm overflow-hidden">
                 <div class="flex items-center space-x-3 pb-4 mb-4 border-b border-slate-100">
-                    <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold">1</div>
+                    <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold shrink-0">1</div>
                     <h2 class="text-base font-bold text-slate-900 uppercase tracking-wide">TUJUAN</h2>
                 </div>
-                <div class="text-slate-700 text-sm leading-relaxed whitespace-pre-line">
+                <div class="text-slate-700 text-sm leading-relaxed whitespace-pre-line p-5 bg-slate-50/70 rounded-2xl border border-slate-100" style="overflow-wrap:anywhere; word-break:break-word; max-width:100%; overflow:hidden;">
                     {{ $sop->tujuan }}
                 </div>
             </div>
 
             <!-- 2. RUANG LINGKUP -->
-            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm overflow-hidden">
                 <div class="flex items-center space-x-3 pb-4 mb-4 border-b border-slate-100">
-                    <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold">2</div>
+                    <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold shrink-0">2</div>
                     <h2 class="text-base font-bold text-slate-900 uppercase tracking-wide">RUANG LINGKUP</h2>
                 </div>
-                <div class="text-slate-700 text-sm leading-relaxed whitespace-pre-line">
+                <div class="text-slate-700 text-sm leading-relaxed whitespace-pre-line p-5 bg-slate-50/70 rounded-2xl border border-slate-100" style="overflow-wrap:anywhere; word-break:break-word; max-width:100%; overflow:hidden;">
                     {{ $sop->ruang_lingkup }}
                 </div>
             </div>
 
             <!-- 3. DEFINISI -->
-            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm overflow-hidden">
                 <div class="flex items-center space-x-3 pb-4 mb-4 border-b border-slate-100">
-                    <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold">3</div>
+                    <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold shrink-0">3</div>
                     <h2 class="text-base font-bold text-slate-900 uppercase tracking-wide">DEFINISI</h2>
                 </div>
-                <div class="text-slate-700 text-sm leading-relaxed whitespace-pre-line">
+                <div class="text-slate-700 text-sm leading-relaxed whitespace-pre-line p-5 bg-slate-50/70 rounded-2xl border border-slate-100" style="overflow-wrap:anywhere; word-break:break-word; max-width:100%; overflow:hidden;">
                     {{ $sop->definisi }}
                 </div>
             </div>
 
             <!-- 4. CATATAN REVISI -->
-            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm overflow-hidden">
                 <div class="flex items-center space-x-3 pb-4 mb-4 border-b border-slate-100">
-                    <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold">4</div>
+                    <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold shrink-0">4</div>
                     <h2 class="text-base font-bold text-slate-900 uppercase tracking-wide">CATATAN REVISI</h2>
                 </div>
                 
@@ -221,17 +221,17 @@
                     <table class="w-full text-left border-collapse text-xs">
                         <thead>
                             <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider text-[10px] font-bold">
-                                <th class="py-2.5 px-4 w-32">Nomor Revisi</th>
-                                <th class="py-2.5 px-4 w-40">Tanggal Revisi</th>
+                                <th class="py-2.5 px-4 w-32 shrink-0">Nomor Revisi</th>
+                                <th class="py-2.5 px-4 w-40 shrink-0">Tanggal Revisi</th>
                                 <th class="py-2.5 px-4">Keterangan Perubahan</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 text-slate-700">
                             @forelse($sop->revisionNotes as $note)
                                 <tr>
-                                    <td class="py-2.5 px-4 font-mono font-bold text-blue-600">{{ $note->nomor_revisi }}</td>
-                                    <td class="py-2.5 px-4">{{ $note->tanggal_revisi ? $note->tanggal_revisi->format('d M Y') : '-' }}</td>
-                                    <td class="py-2.5 px-4">{{ $note->keterangan }}</td>
+                                    <td class="py-2.5 px-4 font-mono font-bold text-blue-600 whitespace-nowrap">{{ $note->nomor_revisi }}</td>
+                                    <td class="py-2.5 px-4 whitespace-nowrap">{{ $note->tanggal_revisi ? $note->tanggal_revisi->format('d M Y') : '-' }}</td>
+                                    <td class="py-2.5 px-4 text-break-anywhere break-words">{{ $note->keterangan }}</td>
                                 </tr>
                             @empty
                                 <tr>
@@ -244,21 +244,21 @@
             </div>
 
             <!-- 5. ATURAN UMUM -->
-            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm overflow-hidden">
                 <div class="flex items-center space-x-3 pb-4 mb-4 border-b border-slate-100">
-                    <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold">5</div>
+                    <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold shrink-0">5</div>
                     <h2 class="text-base font-bold text-slate-900 uppercase tracking-wide">ATURAN UMUM</h2>
                 </div>
-                <div class="text-slate-700 text-sm leading-relaxed whitespace-pre-line">
+                <div class="text-slate-700 text-sm leading-relaxed whitespace-pre-line p-5 bg-slate-50/70 rounded-2xl border border-slate-100" style="overflow-wrap:anywhere; word-break:break-word; max-width:100%; overflow:hidden;">
                     {{ $sop->aturan_umum }}
                 </div>
             </div>
 
             <!-- 6. FLOWCHART SECTION -->
-            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm overflow-hidden">
                 <div class="flex items-center justify-between pb-4 mb-6 border-b border-slate-100">
                     <div class="flex items-center space-x-3">
-                        <div class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-sm font-bold">6</div>
+                        <div class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-sm font-bold shrink-0">6</div>
                         <h2 class="text-base font-bold text-slate-900 uppercase tracking-wide">DIAGRAM ALIR (FLOWCHART)</h2>
                     </div>
 
@@ -278,13 +278,13 @@
 
                 @if($sop->flowchart)
                     @if($sop->flowchart->isImage())
-                        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 text-center">
-                            <img src="{{ $sop->flowchart->preview_url }}" alt="Flowchart {{ $sop->nama_sop }}" class="max-h-[600px] w-auto mx-auto object-contain rounded-xl shadow-sm">
+                        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 text-center overflow-hidden">
+                            <img src="{{ $sop->flowchart->preview_url }}" alt="Flowchart {{ $sop->nama_sop }}" class="max-h-[600px] max-w-full w-auto mx-auto object-contain rounded-xl shadow-sm">
                         </div>
                     @else
                         <div class="p-8 text-center bg-purple-50/50 rounded-2xl border border-purple-200">
                             <i class="fa-solid fa-file-pdf text-6xl text-rose-500 mb-3"></i>
-                            <h3 class="text-sm font-bold text-slate-800">{{ $sop->flowchart->nama_file }}</h3>
+                            <h3 class="text-sm font-bold text-slate-800 break-words text-break-anywhere">{{ $sop->flowchart->nama_file }}</h3>
                             <p class="text-xs text-slate-500 mt-1">Berkas format PDF &bull; {{ $sop->flowchart->formatted_size }}</p>
                             <div class="mt-4 flex items-center justify-center space-x-3">
                                 <a href="{{ $sop->flowchart->preview_url }}" target="_blank" class="inline-flex items-center space-x-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-xl shadow-sm">
@@ -309,10 +309,10 @@
         </div>
 
         <!-- Right 1 Col: Attachments, Version History, & Rejection History -->
-        <div class="space-y-8">
+        <div class="space-y-8" style="min-width:0; overflow:hidden;">
             
             <!-- LAMPIRAN BERKAS -->
-            <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm">
+            <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm overflow-hidden">
                 <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
                     <div class="flex items-center space-x-2.5">
                         <i class="fa-solid fa-paperclip text-amber-500 text-base"></i>
@@ -354,7 +354,7 @@
 
             <!-- RIWAYAT PENOLAKAN (IF ANY) -->
             @if($sop->rejectionReasons->count() > 0)
-                <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm">
+                <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm overflow-hidden">
                     <div class="flex items-center space-x-2.5 pb-4 mb-4 border-b border-slate-100">
                         <i class="fa-solid fa-clock-rotate-left text-rose-500 text-base"></i>
                         <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wide">RIWAYAT PENOLAKAN</h2>
@@ -367,7 +367,7 @@
                                     <span>Reviewer: <strong>{{ $rej->reviewer?->name ?? 'Super Admin' }}</strong></span>
                                     <span>{{ $rej->created_at ? $rej->created_at->format('d/m/Y H:i') : '' }}</span>
                                 </div>
-                                <p class="text-rose-950 italic leading-relaxed">
+                                <p class="text-rose-950 italic leading-relaxed text-break-anywhere break-words">
                                     "{{ $rej->alasan_penolakan }}"
                                 </p>
                             </div>
@@ -377,7 +377,7 @@
             @endif
 
             <!-- RIWAYAT VERSI DOKUMEN -->
-            <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm">
+            <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm overflow-hidden">
                 <div class="flex items-center space-x-2.5 pb-4 mb-4 border-b border-slate-100">
                     <i class="fa-solid fa-timeline text-blue-500 text-base"></i>
                     <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wide">RIWAYAT VERSI SNAPSHOT</h2>
@@ -392,7 +392,7 @@
                                     <span class="font-bold text-slate-900">Versi {{ $v->version_number }}</span>
                                     <span class="text-[10px] text-slate-400">{{ $v->created_at ? $v->created_at->format('d M Y, H:i') : '-' }}</span>
                                 </div>
-                                <p class="text-[11px] text-slate-600 mt-0.5">{{ $v->change_description ?? 'Pembaruan data' }}</p>
+                                <p class="text-[11px] text-slate-600 mt-0.5 text-break-anywhere break-words">{{ $v->change_description ?? 'Pembaruan data' }}</p>
                                 <p class="text-[10px] text-slate-400 mt-0.5">Oleh: {{ $v->user?->name ?? 'Sistem' }}</p>
                             </div>
                         </div>

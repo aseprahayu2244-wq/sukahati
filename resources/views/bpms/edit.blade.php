@@ -1,4 +1,4 @@
-﻿<x-app-layout>
+<x-app-layout>
     <x-slot name="headerTitle">Revisi & Edit Dokumen BPM</x-slot>
     <x-slot name="breadcrumb">
         <a href="{{ route('dashboard') }}" class="hover:underline">Beranda</a>
@@ -129,7 +129,7 @@
                     <label for="bod_id" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
                         BOD (Board of Directors)
                     </label>
-                    <select id="bod_id" name="bod_id" 
+                    <select id="bod_id" name="bod_id" onchange="onBodChange(this.value)"
                             class="w-full bg-slate-50 text-slate-900 text-sm rounded-xl px-4 py-3 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                         <option value="">-- Pilih BOD (Opsional) --</option>
                         @foreach($bods as $bod)
@@ -145,7 +145,7 @@
                     <label for="department_id" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
                         Departemen <span class="text-rose-500">*</span>
                     </label>
-                    <select id="department_id" name="department_id" required 
+                    <select id="department_id" name="department_id" required onchange="onDepartmentChange(this.value)"
                             class="w-full bg-slate-50 text-slate-900 text-sm rounded-xl px-4 py-3 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                         <option value="">-- Pilih Departemen --</option>
                         @foreach($departments as $dept)
@@ -178,8 +178,8 @@
                             <i class="fa-solid fa-layer-group"></i>
                         </div>
                         <div>
-                            <h2 class="text-lg font-bold text-slate-900">2. BPM Builder (Hierarki & RACI)</h2>
-                            <p class="text-xs text-slate-500 mt-0.5">Tambah baris L1, L2, L3 secara bebas, ubah urutan (drag & drop), dan perbaiki RACI sesuai arahan.</p>
+                            <h2 class="text-lg font-bold text-slate-900">2. pengajuan BPM</h2>
+                
                         </div>
                     </div>
 
@@ -305,18 +305,140 @@
         </div>
     </form>
 
-    <script>
-        const availablePositions = @json($positions);
-        const existingSteps = @json($bpm->steps->map(fn($s) => [
+    @php
+        $departmentsJson = $departments->map(fn($d) => [
+            'id' => $d->id,
+            'name' => $d->name,
+            'bod_id' => $d->bod_id,
+            'bod_name' => $d->bod?->name,
+        ])->values();
+
+        $positionsJson = $positions->map(fn($p) => [
+            'id' => $p->id,
+            'name' => $p->name,
+            'division_id' => $p->division_id,
+            'division_name' => $p->division?->name,
+        ])->values();
+
+        $existingStepsJson = $bpm->steps->map(fn($s) => [
             'level' => $s->level,
             'activity_description' => $s->activity_description,
             'raci_r' => $s->responsible->pluck('position_id')->toArray(),
             'raci_a' => $s->accountable->pluck('position_id')->first() ?? '',
             'raci_c' => $s->consulted->pluck('position_id')->toArray(),
             'raci_i' => $s->informed->pluck('position_id')->toArray(),
-        ]));
+        ])->values();
+    @endphp
+    <script>
+        const allDepartments = @json($departmentsJson);
+        const availablePositions = @json($positionsJson);
+        const existingSteps = @json($existingStepsJson);
 
         let stepIndex = 0;
+
+        function onBodChange(bodId, preserveDeptId = null) {
+            const deptSelect = document.getElementById('department_id');
+            const currentVal = preserveDeptId !== null ? String(preserveDeptId) : String(deptSelect.value || '');
+
+            const filtered = bodId
+                ? allDepartments.filter(d => String(d.bod_id) === String(bodId))
+                : allDepartments;
+
+            deptSelect.innerHTML = '';
+            const defaultOpt = document.createElement('option');
+            defaultOpt.value = '';
+            defaultOpt.textContent = bodId && filtered.length === 0
+                ? '-- Tidak ada departemen di BOD ini --'
+                : '-- Pilih Departemen --';
+            deptSelect.appendChild(defaultOpt);
+
+            let stillValid = false;
+            filtered.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d.id;
+                opt.textContent = d.bod_name && !bodId ? `${d.name} (${d.bod_name})` : d.name;
+                if (String(d.id) === currentVal) {
+                    opt.selected = true;
+                    stillValid = true;
+                }
+                deptSelect.appendChild(opt);
+            });
+
+            if (!stillValid) {
+                deptSelect.value = '';
+            }
+            refreshAllRaciDropdowns();
+        }
+
+        function onDepartmentChange(deptId) {
+            const bodSelect = document.getElementById('bod_id');
+            if (deptId && bodSelect && !bodSelect.value) {
+                const dept = allDepartments.find(d => String(d.id) === String(deptId));
+                if (dept && dept.bod_id) {
+                    bodSelect.value = dept.bod_id;
+                    onBodChange(dept.bod_id, deptId);
+                    return;
+                }
+            }
+            refreshAllRaciDropdowns();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text ?? '';
+            return div.innerHTML;
+        }
+
+        function buildPositionOptionsHtml(selectedValues = [], includePlaceholder = false) {
+            const selectedSet = new Set((Array.isArray(selectedValues) ? selectedValues : [selectedValues]).map(v => String(v)));
+            const deptId = document.getElementById('department_id')?.value || '';
+
+            let html = includePlaceholder ? '<option value="">-- Pilih Jabatan --</option>' : '';
+
+            if (availablePositions.length === 0) {
+                return html + '<option value="" disabled>-- Belum ada data jabatan --</option>';
+            }
+
+            if (deptId) {
+                const deptPositions = availablePositions.filter(p => String(p.division_id) === String(deptId));
+                const otherPositions = availablePositions.filter(p => String(p.division_id) !== String(deptId));
+
+                if (deptPositions.length > 0) {
+                    html += '<optgroup label="Jabatan Departemen Terpilih">';
+                    deptPositions.forEach(p => {
+                        const sel = selectedSet.has(String(p.id)) ? 'selected' : '';
+                        html += `<option value="${p.id}" ${sel}>${escapeHtml(p.name)}</option>`;
+                    });
+                    html += '</optgroup>';
+                }
+
+                if (otherPositions.length > 0) {
+                    html += '<optgroup label="Jabatan Departemen Lain">';
+                    otherPositions.forEach(p => {
+                        const sel = selectedSet.has(String(p.id)) ? 'selected' : '';
+                        const label = p.division_name ? `${p.name} (${p.division_name})` : p.name;
+                        html += `<option value="${p.id}" ${sel}>${escapeHtml(label)}</option>`;
+                    });
+                    html += '</optgroup>';
+                }
+            } else {
+                availablePositions.forEach(p => {
+                    const sel = selectedSet.has(String(p.id)) ? 'selected' : '';
+                    const label = p.division_name ? `${p.name} (${p.division_name})` : p.name;
+                    html += `<option value="${p.id}" ${sel}>${escapeHtml(label)}</option>`;
+                });
+            }
+
+            return html;
+        }
+
+        function refreshAllRaciDropdowns() {
+            document.querySelectorAll('#builderCardsContainer select.raci-select').forEach(select => {
+                const isSingle = !select.multiple;
+                const selected = Array.from(select.selectedOptions).map(o => o.value).filter(v => v !== '');
+                select.innerHTML = buildPositionOptionsHtml(selected, isSingle);
+            });
+        }
 
         function addStepRow(level, initialData = {}) {
             const container = document.getElementById('builderCardsContainer');
@@ -346,22 +468,10 @@
             const selectedC = initialData.raci_c || [];
             const selectedI = initialData.raci_i || [];
 
-            let posOptionsR = '';
-            let posOptionsA = '<option value="">-- Pilih Jabatan --</option>';
-            let posOptionsC = '';
-            let posOptionsI = '';
-
-            availablePositions.forEach(p => {
-                const isR = selectedR.includes(p.id) ? 'selected' : '';
-                const isA = (String(selectedA) === String(p.id)) ? 'selected' : '';
-                const isC = selectedC.includes(p.id) ? 'selected' : '';
-                const isI = selectedI.includes(p.id) ? 'selected' : '';
-
-                posOptionsR += `<option value="${p.id}" ${isR}>${p.name}</option>`;
-                posOptionsA += `<option value="${p.id}" ${isA}>${p.name}</option>`;
-                posOptionsC += `<option value="${p.id}" ${isC}>${p.name}</option>`;
-                posOptionsI += `<option value="${p.id}" ${isI}>${p.name}</option>`;
-            });
+            const posOptionsR = buildPositionOptionsHtml(selectedR, true);
+            const posOptionsA = buildPositionOptionsHtml(selectedA ? [selectedA] : [], true);
+            const posOptionsC = buildPositionOptionsHtml(selectedC, true);
+            const posOptionsI = buildPositionOptionsHtml(selectedI, true);
 
             const card = document.createElement('div');
             card.id = id;
@@ -408,7 +518,6 @@
                             <i class="fa-solid fa-users-gear text-indigo-500"></i>
                             <span>Tanggung Jawab RACI untuk aktivitas ini:</span>
                         </span>
-                        <span class="text-[10px] text-slate-400 hidden sm:inline">* Tahan Ctrl/Cmd untuk memilih beberapa jabatan</span>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -418,7 +527,7 @@
                                 <span>Responsible (R)</span>
                                 <span class="text-[9px] px-1.5 py-0.2 rounded bg-indigo-50 text-indigo-600 font-bold">Pelaksana</span>
                             </label>
-                            <select name="steps[${currentIndex}][raci_r][]" multiple size="2" class="w-full bg-slate-50 text-slate-900 text-xs rounded-lg p-1.5 border border-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                            <select name="steps[${currentIndex}][raci_r][]" class="raci-select w-full bg-slate-50 text-slate-900 text-xs rounded-lg p-2 border border-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500">
                                 ${posOptionsR}
                             </select>
                         </div>
@@ -429,7 +538,7 @@
                                 <span>Accountable (A)</span>
                                 <span class="text-[9px] px-1.5 py-0.2 rounded bg-amber-50 text-amber-700 font-bold">Penanggung Jawab</span>
                             </label>
-                            <select name="steps[${currentIndex}][raci_a]" class="w-full bg-slate-50 text-slate-900 text-xs rounded-lg p-2 border border-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500">
+                            <select name="steps[${currentIndex}][raci_a]" class="raci-select w-full bg-slate-50 text-slate-900 text-xs rounded-lg p-2 border border-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500">
                                 ${posOptionsA}
                             </select>
                         </div>
@@ -440,7 +549,7 @@
                                 <span>Consulted (C)</span>
                                 <span class="text-[9px] px-1.5 py-0.2 rounded bg-sky-50 text-sky-600 font-bold">Konsultasi</span>
                             </label>
-                            <select name="steps[${currentIndex}][raci_c][]" multiple size="2" class="w-full bg-slate-50 text-slate-900 text-xs rounded-lg p-1.5 border border-slate-200 focus:outline-none focus:ring-1 focus:ring-sky-500">
+                            <select name="steps[${currentIndex}][raci_c][]" class="raci-select w-full bg-slate-50 text-slate-900 text-xs rounded-lg p-2 border border-slate-200 focus:outline-none focus:ring-1 focus:ring-sky-500">
                                 ${posOptionsC}
                             </select>
                         </div>
@@ -451,7 +560,7 @@
                                 <span>Informed (I)</span>
                                 <span class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-600 font-bold">Informasi</span>
                             </label>
-                            <select name="steps[${currentIndex}][raci_i][]" multiple size="2" class="w-full bg-slate-50 text-slate-900 text-xs rounded-lg p-1.5 border border-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                            <select name="steps[${currentIndex}][raci_i][]" class="raci-select w-full bg-slate-50 text-slate-900 text-xs rounded-lg p-2 border border-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500">
                                 ${posOptionsI}
                             </select>
                         </div>
@@ -584,6 +693,11 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
+            const bodSelect = document.getElementById('bod_id');
+            const deptSelect = document.getElementById('department_id');
+            if (bodSelect && bodSelect.value) {
+                onBodChange(bodSelect.value, deptSelect ? deptSelect.value : null);
+            }
             if (existingSteps && existingSteps.length > 0) {
                 existingSteps.forEach(s => {
                     addStepRow(s.level, s);

@@ -180,11 +180,21 @@
             }
 
             try {
-                const res = await fetch(`/api/bods/${bodId}/departments`);
+                const res = await fetch(`{{ url('/api/bods') }}/${bodId}/departments`, {
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
                 const depts = await res.json();
+                if (depts.length === 0) {
+                    deptSelect.innerHTML = '<option value="">-- Tidak ada departemen di BOD ini --</option>';
+                    return;
+                }
                 deptSelect.innerHTML = '<option value="">-- Pilih Departemen --</option>';
                 depts.forEach(d => {
-                    deptSelect.innerHTML += `<option value="${d.id}">${d.name}</option>`;
+                    const opt = document.createElement('option');
+                    opt.value = d.id;
+                    opt.textContent = d.name;
+                    deptSelect.appendChild(opt);
                 });
             } catch (e) {
                 deptSelect.innerHTML = '<option value="">Gagal memuat departemen</option>';
@@ -201,11 +211,21 @@
             }
 
             try {
-                const res = await fetch(`/api/departments/${deptId}/positions`);
+                const res = await fetch(`{{ url('/api/departments') }}/${deptId}/positions`, {
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
                 const positions = await res.json();
+                if (positions.length === 0) {
+                    posSelect.innerHTML = '<option value="">-- Tidak ada jabatan di departemen ini --</option>';
+                    return;
+                }
                 posSelect.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
                 positions.forEach(p => {
-                    posSelect.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+                    const opt = document.createElement('option');
+                    opt.value = p.id;
+                    opt.textContent = p.name;
+                    posSelect.appendChild(opt);
                 });
             } catch (e) {
                 posSelect.innerHTML = '<option value="">Gagal memuat jabatan</option>';
@@ -215,8 +235,11 @@
         function handleFileSelect(input) {
             if (input.files && input.files[0]) {
                 const file = input.files[0];
+                const sizeText = file.size >= 1048576
+                    ? '(' + (file.size / 1048576).toFixed(2) + ' MB)'
+                    : '(' + Math.max(1, Math.round(file.size / 1024)) + ' KB)';
                 document.getElementById('fileName').textContent = file.name;
-                document.getElementById('fileSize').textContent = '(' + (file.size / 1024 / 1024).toFixed(2) + ' MB)';
+                document.getElementById('fileSize').textContent = sizeText;
                 document.getElementById('uploadPrompt').classList.add('hidden');
                 document.getElementById('filePreview').classList.remove('hidden');
             }

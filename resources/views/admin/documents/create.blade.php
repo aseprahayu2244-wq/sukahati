@@ -113,7 +113,7 @@
             <!-- File Upload Zone -->
             <div>
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Berkas File <span class="text-rose-500">*</span></label>
-                <div class="relative border-2 border-dashed border-slate-300 hover:border-blue-500 rounded-3xl p-8 text-center bg-slate-50/50 hover:bg-blue-50/30 transition-all-200 group">
+                <div id="dropZone" class="relative border-2 border-dashed border-slate-300 hover:border-blue-500 rounded-3xl p-8 text-center bg-slate-50/50 hover:bg-blue-50/30 transition-all-200 group">
                     <input type="file" name="file" id="fileInput" required onchange="handleFileSelect(this)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                     <div id="uploadPrompt" class="flex flex-col items-center justify-center pointer-events-none">
                         <div class="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-2xl mb-3 shadow-inner group-hover:scale-110 transition-all-200">
@@ -122,10 +122,15 @@
                         <p class="text-sm font-bold text-slate-700">Klik atau geser file ke area ini untuk upload</p>
                         <p class="text-xs text-slate-400 mt-1">Mendukung file dokumen PDF, Word, Excel, Gambar, Diagram BPMN, Zip dll (Maksimal 50MB)</p>
                     </div>
-                    <div id="filePreview" class="hidden flex items-center justify-center space-x-3 pointer-events-none">
-                        <i class="fa-solid fa-file text-2xl text-blue-600"></i>
-                        <span id="fileName" class="text-sm font-bold text-slate-800"></span>
-                        <span id="fileSize" class="text-xs text-slate-400 font-medium"></span>
+                    <div id="filePreview" class="hidden flex flex-col items-center justify-center space-y-2 pointer-events-none">
+                        <div class="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl">
+                            <i class="fa-solid fa-file-circle-check"></i>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span id="fileName" class="text-sm font-bold text-slate-800 break-all"></span>
+                            <span id="fileSize" class="text-xs text-slate-500 font-medium"></span>
+                        </div>
+                        <span class="text-[11px] font-semibold text-emerald-600">File siap diunggah (klik lagi untuk mengganti)</span>
                     </div>
                 </div>
             </div>
@@ -171,11 +176,21 @@
             }
 
             try {
-                const res = await fetch(`/api/bods/${bodId}/departments`);
+                const res = await fetch(`{{ url('/api/bods') }}/${bodId}/departments`, {
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
                 const depts = await res.json();
+                if (depts.length === 0) {
+                    deptSelect.innerHTML = '<option value="">-- Tidak ada departemen di BOD ini --</option>';
+                    return;
+                }
                 deptSelect.innerHTML = '<option value="">-- Pilih Departemen --</option>';
                 depts.forEach(d => {
-                    deptSelect.innerHTML += `<option value="${d.id}">${d.name}</option>`;
+                    const opt = document.createElement('option');
+                    opt.value = d.id;
+                    opt.textContent = d.name;
+                    deptSelect.appendChild(opt);
                 });
             } catch (e) {
                 deptSelect.innerHTML = '<option value="">Gagal memuat departemen</option>';
@@ -192,11 +207,21 @@
             }
 
             try {
-                const res = await fetch(`/api/departments/${deptId}/positions`);
+                const res = await fetch(`{{ url('/api/departments') }}/${deptId}/positions`, {
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
                 const positions = await res.json();
+                if (positions.length === 0) {
+                    posSelect.innerHTML = '<option value="">-- Tidak ada jabatan di departemen ini --</option>';
+                    return;
+                }
                 posSelect.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
                 positions.forEach(p => {
-                    posSelect.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+                    const opt = document.createElement('option');
+                    opt.value = p.id;
+                    opt.textContent = p.name;
+                    posSelect.appendChild(opt);
                 });
             } catch (e) {
                 posSelect.innerHTML = '<option value="">Gagal memuat jabatan</option>';
@@ -204,12 +229,25 @@
         }
 
         function handleFileSelect(input) {
+            const dropZone = document.getElementById('dropZone');
+            const prompt = document.getElementById('uploadPrompt');
+            const preview = document.getElementById('filePreview');
             if (input.files && input.files[0]) {
                 const file = input.files[0];
+                const sizeText = file.size >= 1048576
+                    ? '(' + (file.size / 1048576).toFixed(2) + ' MB)'
+                    : '(' + Math.max(1, Math.round(file.size / 1024)) + ' KB)';
                 document.getElementById('fileName').textContent = file.name;
-                document.getElementById('fileSize').textContent = '(' + (file.size / 1024 / 1024).toFixed(2) + ' MB)';
-                document.getElementById('uploadPrompt').classList.add('hidden');
-                document.getElementById('filePreview').classList.remove('hidden');
+                document.getElementById('fileSize').textContent = sizeText;
+                prompt.classList.add('hidden');
+                preview.classList.remove('hidden');
+                dropZone.classList.remove('border-slate-300', 'bg-slate-50/50');
+                dropZone.classList.add('border-emerald-500', 'bg-emerald-50/30');
+            } else {
+                prompt.classList.remove('hidden');
+                preview.classList.add('hidden');
+                dropZone.classList.add('border-slate-300', 'bg-slate-50/50');
+                dropZone.classList.remove('border-emerald-500', 'bg-emerald-50/30');
             }
         }
 

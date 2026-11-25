@@ -51,6 +51,16 @@
         .glass-header { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); }
         .folder-card:hover { transform: translateY(-3px); box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.1); }
         .transition-all-200 { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .text-break-anywhere {
+            overflow-wrap: anywhere !important;
+            word-break: break-word !important;
+            word-wrap: break-word !important;
+        }
+        /* Fix grid children overflow — critical for SOP/BPM show page */
+        .sop-grid > * {
+            min-width: 0;
+            overflow: hidden;
+        }
     </style>
 </head>
 <body class="h-full bg-slate-50 text-slate-800 antialiased font-sans">
@@ -254,20 +264,7 @@
                 </div>
 
                 <div class="flex items-center space-x-3">
-                    @if(auth()->check() && auth()->user()->canManageDocuments())
-                    <a href="{{ route('bpms.create') }}" class="hidden sm:inline-flex items-center space-x-2 text-xs font-bold px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-md shadow-indigo-500/20 transition-all-200">
-                        <i class="fa-solid fa-network-wired"></i>
-                        <span>BPM Builder</span>
-                    </a>
-                    <a href="{{ route('sops.create') }}" class="hidden sm:inline-flex items-center space-x-2 text-xs font-bold px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-md shadow-emerald-500/20 transition-all-200">
-                        <i class="fa-solid fa-file-signature"></i>
-                        <span>Buat SOP</span>
-                    </a>
-                    <a href="{{ route('documents.create') }}" class="inline-flex items-center space-x-2 text-xs font-bold px-3.5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl shadow-md shadow-blue-500/20 transition-all-200">
-                        <i class="fa-solid fa-cloud-arrow-up"></i>
-                        <span class="hidden sm:inline">Upload Dokumen</span>
-                    </a>
-                    @endif
+                    
 
                     <!-- Notification Bell -->
                     @if(auth()->check())
@@ -367,5 +364,6 @@
             return false;
         }
     </script>
+    @stack('scripts')
 </body>
 </html>

@@ -14,32 +14,11 @@
             </div>
             <div>
                 <h1 class="text-xl font-extrabold text-slate-900">{{ $typeLabel }} - Pilih BOD</h1>
-                <p class="text-xs text-slate-500 mt-0.5">Pilih BOD di bawah ini untuk melihat Departemen dan dokumen {{ $typeLabel }}</p>
             </div>
         </div>
 
         <div class="flex flex-wrap items-center gap-2">
-            @if($type === 'sop' && auth()->check() && auth()->user()->canManageDocuments())
-                <a href="{{ route('sops.index') }}" class="inline-flex items-center space-x-2 text-xs font-bold px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-xl transition-all-200 border border-emerald-200">
-                    <i class="fa-solid fa-clipboard-check"></i>
-                    <span>Workflow Pengajuan SOP</span>
-                    @if(auth()->user()->isSuperAdmin() && ($globalPendingSopCount ?? 0) > 0)
-                        <span class="bg-amber-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">{{ $globalPendingSopCount }}</span>
-                    @endif
-                </a>
-
-                <a href="{{ route('sops.create') }}" class="inline-flex items-center space-x-2 text-xs font-bold px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-md shadow-emerald-500/20 transition-all-200">
-                    <i class="fa-solid fa-plus"></i>
-                    <span>Buat / Ajukan SOP</span>
-                </a>
-            @endif
-
-            @if(auth()->check() && auth()->user()->isSuperAdmin())
-            <a href="{{ route('admin.bods.index') }}" class="inline-flex items-center space-x-2 text-xs font-bold px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-all-200">
-                <i class="fa-solid fa-gear"></i>
-                <span>Kelola BOD</span>
-            </a>
-            @endif
+          
         </div>
     </div>
 

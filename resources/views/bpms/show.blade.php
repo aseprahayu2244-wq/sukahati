@@ -19,7 +19,7 @@
     <!-- Header Card -->
     <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm mb-8 relative overflow-hidden">
         <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-6">
-            <div class="flex-1">
+            <div class="flex-1 min-w-0">
                 <div class="flex flex-wrap items-center gap-2 mb-3">
                     <span class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-bold {{ $bpm->getStatusBadgeClass() }}">
                         <i class="fa-solid {{ $bpm->getStatusIcon() }} text-[11px]"></i>
@@ -44,7 +44,7 @@
                     @endif
                 </div>
 
-                <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-2 break-words text-break-anywhere">
                     {{ $bpm->nama_bpm }}
                 </h1>
                 
@@ -148,9 +148,9 @@
 
     <!-- Description Card if available -->
     @if($bpm->deskripsi)
-        <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm mb-8">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm mb-8 overflow-hidden">
             <h2 class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-2">Deskripsi / Ruang Lingkup Proses</h2>
-            <div class="text-xs sm:text-sm text-slate-600 leading-relaxed whitespace-pre-line">
+            <div class="text-xs sm:text-sm text-slate-600 leading-relaxed whitespace-pre-line text-break-anywhere break-words [overflow-wrap:anywhere] [word-break:break-word] p-5 bg-slate-50/70 rounded-2xl border border-slate-100">
                 {{ $bpm->deskripsi }}
             </div>
         </div>
@@ -161,7 +161,7 @@
     <!-- ========================================================= -->
     @if($bpm->isBuilder())
         <!-- BPM Builder Hierarchy & RACI Matrix -->
-        <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm mb-8">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm mb-8 overflow-hidden">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
                 <div class="flex items-center space-x-3.5">
                     <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-lg font-bold shadow-sm shadow-indigo-500/20">
@@ -184,14 +184,14 @@
 
             <!-- Table View -->
             <div class="overflow-x-auto border border-slate-200 rounded-2xl shadow-inner">
-                <table class="w-full text-left text-xs text-slate-700 min-w-[850px]">
+                <table class="w-full text-left text-xs text-slate-700 table-fixed min-w-[780px]">
                     <thead class="bg-slate-100/90 text-slate-700 font-extrabold uppercase text-[10px] tracking-wider border-b border-slate-200">
                         <tr>
-                            <th class="py-3.5 px-4 min-w-[320px]">Level / Aktivitas</th>
-                            <th class="py-3.5 px-4 w-48 text-indigo-700">Responsible (R)</th>
-                            <th class="py-3.5 px-4 w-44 text-amber-700">Accountable (A)</th>
-                            <th class="py-3.5 px-4 w-44 text-sky-700">Consulted (C)</th>
-                            <th class="py-3.5 px-4 w-44 text-emerald-700">Informed (I)</th>
+                            <th class="py-3.5 px-4 w-[56%]">Level / Aktivitas</th>
+                            <th class="py-3.5 px-2 w-[11%] text-center text-indigo-700">Responsible (R)</th>
+                            <th class="py-3.5 px-2 w-[11%] text-center text-amber-700">Accountable (A)</th>
+                            <th class="py-3.5 px-2 w-[11%] text-center text-sky-700">Consulted (C)</th>
+                            <th class="py-3.5 px-2 w-[11%] text-center text-emerald-700">Informed (I)</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 bg-white">
@@ -219,7 +219,7 @@
                                         <span class="text-[10px] font-extrabold px-2 py-0.5 rounded border {{ $step->getLevelBadgeClass() }}">
                                             {{ $step->level }}
                                         </span>
-                                        <span class="text-slate-900 text-xs">{{ $step->activity_description }}</span>
+                                        <span class="text-slate-900 text-xs break-words text-break-anywhere">{{ $step->activity_description }}</span>
                                     </div>
                                 </td>
                                 <!-- Responsible -->

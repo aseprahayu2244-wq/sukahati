@@ -72,14 +72,24 @@ class SopAttachment extends Model
         };
     }
 
-    public function getUrl(): string
+    public function getUrlAttribute(): string
     {
         return route('sops.attachments.download', [$this->sop_id, $this->id]);
     }
 
-    public function getPreviewUrl(): string
+    public function getPreviewUrlAttribute(): string
     {
         return route('sops.attachments.preview', [$this->sop_id, $this->id]);
+    }
+
+    public function getUrl(): string
+    {
+        return $this->url;
+    }
+
+    public function getPreviewUrl(): string
+    {
+        return $this->preview_url;
     }
 }
 

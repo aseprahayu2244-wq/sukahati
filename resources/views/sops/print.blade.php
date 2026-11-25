@@ -14,32 +14,64 @@
     @endunless
 
     <style>
+        /* ================================================================
+           SOP PDF & PRINT TEMPLATE — Standar Dokumen Resmi A4
+           Font: Times New Roman | Kertas: A4 (210mm x 297mm)
+        ================================================================ */
+
         @page {
-            size: A4;
-            margin: 1.5cm;
+            size: A4 portrait;
+            margin: 18mm 18mm 20mm 22mm;
         }
 
-        body {
-            font-family: 'Plus Jakarta Sans', Arial, sans-serif;
-            color: #1e293b;
-            background: #f1f5f9;
-            margin: 0;
-            padding: 20px;
-            font-size: 12pt;
-            line-height: 1.6;
-        }
-
-        .paper-container {
-            background: white;
-            max-width: 210mm;
-            min-height: 297mm;
-            margin: 0 auto;
-            padding: 2.5cm 2cm;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            border-radius: 8px;
+        * {
             box-sizing: border-box;
         }
 
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            color: #000000;
+            background: {{ ($isPdf ?? false) ? '#ffffff' : '#e2e8f0' }};
+            margin: 0;
+            padding: {{ ($isPdf ?? false) ? '0' : '24px 16px' }};
+            font-size: 11pt;
+            line-height: 1.45;
+        }
+
+        @if($isPdf ?? false)
+        /* Garis tepi halaman profesional berulang di setiap halaman A4 */
+        .pdf-page-frame {
+            position: fixed;
+            top: -8mm;
+            left: -10mm;
+            right: -8mm;
+            bottom: -10mm;
+            border: 1.5pt solid #000000;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .paper-container {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            background: #ffffff;
+        }
+        @else
+        /* Tampilan pratinjau kertas A4 di browser */
+        .paper-container {
+            background: #ffffff;
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            padding: 18mm 18mm 20mm 22mm;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border: 1px solid #cbd5e1;
+            position: relative;
+        }
+        @endif
+
+        /* ---- Topbar tombol (hanya di HTML view, bukan PDF) ---- */
         .no-print-bar {
             max-width: 210mm;
             margin: 0 auto 20px auto;
@@ -49,7 +81,9 @@
             background: #1e293b;
             color: white;
             padding: 12px 20px;
-            border-radius: 12px;
+            border-radius: 10px;
+            font-family: Arial, sans-serif;
+            font-size: 13px;
         }
 
         .btn-print {
@@ -58,187 +92,288 @@
             padding: 8px 18px;
             border-radius: 8px;
             font-weight: bold;
-            font-size: 13px;
+            font-size: 12px;
             border: none;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            text-decoration: none;
         }
 
         .btn-print:hover { background: #059669; }
 
         .btn-close {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255,255,255,0.15);
             color: white;
             padding: 8px 16px;
             border-radius: 8px;
-            font-size: 13px;
+            font-size: 12px;
             text-decoration: none;
         }
 
-        /* Official SOP Header Table */
+        /* ================================================================
+           HEADER TABEL RESMI SOP
+        ================================================================ */
         .header-table {
             width: 100%;
             border-collapse: collapse;
-            border: 2px solid #0f172a;
-            margin-bottom: 24px;
+            border: 1.5pt solid #000000;
+            margin-bottom: 14px;
+            table-layout: fixed;
         }
 
-        .header-table td, .header-table th {
-            border: 1px solid #0f172a;
-            padding: 8px 12px;
+        .header-table td {
+            border: 1pt solid #000000;
+            padding: 5px 8px;
             vertical-align: middle;
         }
 
         .header-logo {
-            width: 90px;
+            width: 20%;
             text-align: center;
             padding: 6px;
         }
 
         .header-logo img {
-            max-width: 75px;
-            max-height: 60px;
-            object-contain: contain;
+            max-width: 72px;
+            max-height: 58px;
         }
 
         .header-title-box {
+            width: 46%;
             text-align: center;
+            padding: 6px 10px;
         }
 
         .company-name {
             font-size: 11pt;
-            font-weight: 800;
-            color: #0f172a;
-            letter-spacing: 0.5px;
+            font-weight: bold;
+            color: #000000;
+            letter-spacing: 0.3px;
         }
 
         .sop-title {
-            font-size: 14pt;
-            font-weight: 800;
-            margin-top: 4px;
-            color: #1e40af;
+            font-size: 12.5pt;
+            font-weight: bold;
+            margin-top: 2px;
+            color: #000000;
             text-transform: uppercase;
         }
 
         .sop-name {
-            font-size: 12pt;
-            font-weight: 700;
-            margin-top: 2px;
-            color: #334155;
-        }
-
-        .meta-table {
-            font-size: 9pt;
-            width: 220px;
-        }
-
-        .meta-table td {
-            padding: 4px 8px;
-        }
-
-        /* Section Titles */
-        .section-header {
-            background: #f1f5f9;
-            border-left: 4px solid #1e40af;
-            padding: 6px 12px;
-            font-weight: 800;
             font-size: 11pt;
-            color: #0f172a;
+            font-weight: bold;
+            color: #000000;
             text-transform: uppercase;
-            margin-top: 20px;
-            margin-bottom: 8px;
+        }
+
+        .meta-cell {
+            width: 34%;
+            vertical-align: top;
+            padding: 0 !important;
+        }
+
+        .meta-inner {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .meta-inner td {
+            border: 0;
+            border-top: 1pt solid #000000;
+            padding: 3px 6px;
+            font-size: 9pt;
+            vertical-align: middle;
+            line-height: 1.3;
+        }
+
+        .meta-inner tr:first-child td {
+            border-top: 0;
+        }
+
+        .meta-label {
+            font-weight: bold;
+            background: #f3f4f6;
+            white-space: nowrap;
+            width: 44%;
+            border-right: 1pt solid #000000 !important;
+        }
+
+        /* ================================================================
+           SECTION HEADER & BODY
+        ================================================================ */
+        .section-header {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 11pt;
+            font-weight: bold;
+            color: #000000;
+            text-transform: uppercase;
+            margin-top: 14px;
+            margin-bottom: 6px;
+            padding: 4px 8px;
+            background: #f3f4f6;
+            border: 1pt solid #000000;
+            border-left: 3.5pt solid #000000;
             page-break-after: avoid;
         }
 
         .section-body {
-            font-size: 10pt;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 11pt;
             text-align: justify;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
+            padding: 0 2px;
             white-space: pre-line;
-            line-height: 1.6;
+            line-height: 1.45;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+            color: #000000;
         }
 
-        /* Tables */
+        /* ================================================================
+           TABEL KONTEN (Catatan Revisi, Lampiran)
+        ================================================================ */
         .content-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 9pt;
-            margin-bottom: 16px;
-        }
-
-        .content-table th, .content-table td {
-            border: 1px solid #cbd5e1;
-            padding: 6px 10px;
+            font-size: 10pt;
+            margin-bottom: 12px;
+            font-family: 'Times New Roman', Times, serif;
         }
 
         .content-table th {
-            background: #f8fafc;
-            font-weight: 700;
+            border: 1pt solid #000000;
+            padding: 5px 8px;
+            background: #f3f4f6;
+            font-weight: bold;
+            text-align: center;
             text-transform: uppercase;
+            font-size: 9.5pt;
         }
 
-        /* Signatures Block */
+        .content-table td {
+            border: 1pt solid #000000;
+            padding: 5px 8px;
+            vertical-align: top;
+            line-height: 1.4;
+        }
+
+        /* ================================================================
+           TANDA TANGAN
+        ================================================================ */
         .signature-table {
             width: 100%;
-            margin-top: 40px;
+            margin-top: 16px;
+            margin-bottom: 12px;
             border-collapse: collapse;
             page-break-inside: avoid;
         }
 
         .signature-table td {
             width: 50%;
+            border: 1pt solid #000000;
             text-align: center;
             vertical-align: top;
-            padding: 10px 20px;
+            padding: 8px 12px;
         }
 
-        .signature-box {
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            padding: 16px;
-            background: #f8fafc;
+        .signature-label {
+            font-weight: bold;
+            font-size: 10pt;
+            margin-bottom: 4px;
         }
 
         .signature-space {
-            height: 70px;
+            height: 55px;
         }
 
         .signer-name {
-            font-weight: 800;
+            font-weight: bold;
             font-size: 10.5pt;
-            color: #0f172a;
+            color: #000000;
             text-decoration: underline;
         }
 
         .signer-role {
-            font-size: 9pt;
-            color: #64748b;
+            font-size: 9.5pt;
+            color: #111827;
             margin-top: 2px;
         }
 
-        /* Flowchart */
+        .signer-date {
+            font-size: 8.5pt;
+            color: #374151;
+            margin-top: 2px;
+        }
+
+        /* ================================================================
+           FLOWCHART & LAMPIRAN GAMBAR
+        ================================================================ */
+        .flowchart-box {
+            text-align: center;
+            margin: 8px 0 12px 0;
+            page-break-inside: avoid;
+        }
+
         .flowchart-img {
             max-width: 100%;
-            max-height: 500px;
+            max-height: 225mm;
+            height: auto;
             display: block;
-            margin: 10px auto;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
+            margin: 0 auto;
+            border: 1pt solid #000000;
+        }
+
+        .attachment-preview-item {
+            margin-top: 12px;
+            page-break-inside: avoid;
+            text-align: center;
+        }
+
+        .attachment-preview-caption {
+            font-size: 10pt;
+            font-weight: bold;
+            text-align: left;
+            margin-bottom: 4px;
+        }
+
+        .attachment-preview-img {
+            max-width: 100%;
+            max-height: 210mm;
+            height: auto;
+            border: 1pt solid #94a3b8;
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* ================================================================
+           FOOTER (hanya untuk print browser, PDF pakai canvas page_text)
+        ================================================================ */
+        .page-footer {
+            margin-top: 16px;
+            padding-top: 6px;
+            border-top: 1pt solid #000000;
+            font-size: 8.5pt;
+            color: #333333;
+            display: flex;
+            justify-content: space-between;
         }
 
         @media print {
             body {
-                background: white;
+                background: #ffffff;
                 padding: 0;
+                margin: 0;
             }
 
             .paper-container {
                 box-shadow: none;
+                border: none;
                 padding: 0;
                 margin: 0;
-                max-width: 100%;
+                width: 100%;
+                min-height: auto;
             }
 
             .no-print-bar {
@@ -248,6 +383,10 @@
     </style>
 </head>
 <body>
+
+    @if($isPdf ?? false)
+        <div class="pdf-page-frame"></div>
+    @endif
 
     @unless($isPdf ?? false)
     <!-- Non-Print Controls -->
@@ -277,31 +416,39 @@
                 <td class="header-logo" rowspan="2">
                     @php
                         $logoPath = public_path('images/logo-sukahati.png');
-                        $logoSrc = file_exists($logoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath)) : asset('images/logo-sukahati.png');
+                        $logoSrc = file_exists($logoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath)) : '';
                     @endphp
-                    <img src="{{ $logoSrc }}" alt="Logo">
+                    @if($logoSrc)
+                        <img src="{{ $logoSrc }}" alt="Logo CV. Sukahati Pratama">
+                    @else
+                        <div style="font-size:8pt; font-weight:bold;">CV. SUKAHATI<br>PRATAMA</div>
+                    @endif
                 </td>
                 <td class="header-title-box">
                     <div class="company-name">CV. SUKAHATI PRATAMA</div>
                     <div class="sop-title">STANDARD OPERATING PROCEDURE</div>
                 </td>
-                <td rowspan="2" style="padding: 0; vertical-align: top;">
-                    <table class="meta-table" style="width: 100%; border-collapse: collapse;">
+                <td class="meta-cell" rowspan="2">
+                    <table class="meta-inner">
                         <tr>
-                            <td style="font-weight: bold; background: #f8fafc; width: 45%;">No. Dokumen</td>
-                            <td>: <strong>{{ $sop->nomor_dokumen }}</strong></td>
+                            <td class="meta-label">No. Dokumen</td>
+                            <td><strong>{{ $sop->nomor_dokumen }}</strong></td>
                         </tr>
                         <tr>
-                            <td style="font-weight: bold; background: #f8fafc;">No. Revisi</td>
-                            <td>: {{ $sop->version }}</td>
+                            <td class="meta-label">No. Revisi</td>
+                            <td>{{ $sop->version }}</td>
                         </tr>
                         <tr>
-                            <td style="font-weight: bold; background: #f8fafc;">Tgl. Efektif</td>
-                            <td>: {{ $sop->tanggal_efektif ? $sop->tanggal_efektif->format('d/m/Y') : '-' }}</td>
+                            <td class="meta-label">Tgl. Efektif</td>
+                            <td>{{ $sop->tanggal_efektif ? $sop->tanggal_efektif->format('d/m/Y') : '-' }}</td>
                         </tr>
                         <tr>
-                            <td style="font-weight: bold; background: #f8fafc;">Departemen</td>
-                            <td>: {{ $sop->department?->name ?? '-' }}</td>
+                            <td class="meta-label">Departemen</td>
+                            <td>{{ $sop->department?->name ?? '-' }}</td>
+                        </tr>
+                        <tr>
+                            <td class="meta-label">Status</td>
+                            <td>{{ $sop->getStatusLabel() }}</td>
                         </tr>
                     </table>
                 </td>
@@ -325,38 +472,57 @@
         <div class="section-header">3. DEFINISI</div>
         <div class="section-body">{{ $sop->definisi }}</div>
 
-        <!-- 4. CATATAN REVISI -->
+        <!-- 4. CATATAN REVISI & PENGESAHAN -->
         <div class="section-header">4. CATATAN REVISI</div>
-        <table class="content-table">
+        <table class="content-table" style="margin-bottom: 0;">
             <thead>
                 <tr>
-                    <th style="width: 20%;">Nomor Revisi</th>
-                    <th style="width: 25%;">Tanggal Revisi</th>
-                    <th>Keterangan Perubahan</th>
+                    <th style="width: 14%;">Rev</th>
+                    <th style="width: 24%;">Tanggal Efektif</th>
+                    <th>Alasan Revisi</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($sop->revisionNotes as $n)
                     <tr>
                         <td style="text-align: center; font-weight: bold;">{{ $n->nomor_revisi }}</td>
-                        <td style="text-align: center;">{{ $n->tanggal_revisi ? $n->tanggal_revisi->format('d/m/Y') : '-' }}</td>
+                        <td style="text-align: center;">{{ $n->tanggal_revisi ? $n->tanggal_revisi->format('d F Y') : '-' }}</td>
                         <td>{{ $n->keterangan }}</td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="3" style="text-align: center; color: #94a3b8;">Tidak ada catatan revisi</td>
+                        <td colspan="3" style="text-align: center; color: #64748b;">Tidak ada catatan revisi</td>
                     </tr>
                 @endforelse
             </tbody>
+        </table>
+
+        <!-- Signatures Table (menyatu rapi di bawah Catatan Revisi sesuai format perusahaan) -->
+        <table class="signature-table" style="margin-top: 0;">
+            <tr>
+                <td style="border-top: 0;">
+                    <div class="signature-label">Dibuat oleh,</div>
+                    <div class="signature-space"></div>
+                    <div class="signer-name">{{ $sop->creator?->name ?? 'Admin HRD' }}</div>
+                    <div class="signer-role">{{ $sop->creator?->jabatan ?: ($sop->creator?->getRoleLabel() ?? 'Admin') }}</div>
+                    
+                </td>
+                <td style="border-top: 0;">
+                    <div class="signature-label">Disetujui oleh,</div>
+                    <div class="signature-space"></div>
+                    <div class="signer-name">{{ $sop->approver?->name ?? 'Management / Super Admin' }}</div>
+                    <div class="signer-role">{{ $sop->approver?->jabatan ?: ($sop->approver?->getRoleLabel() ?? 'Super Administrator') }}</div>
+                </td>
+            </tr>
         </table>
 
         <!-- 5. ATURAN UMUM -->
         <div class="section-header">5. ATURAN UMUM</div>
         <div class="section-body">{{ $sop->aturan_umum }}</div>
 
-        <!-- 6. FLOWCHART -->
+        <!-- 6. FLOW CHART -->
         @if($sop->flowchart)
-            <div class="section-header" style="page-break-before: auto;">6. DIAGRAM ALIR (FLOWCHART)</div>
+            <div class="section-header">6. FLOW CHART</div>
             @if($sop->flowchart->isImage())
                 @php
                     $fcSrc = $sop->flowchart->preview_url;
@@ -365,9 +531,11 @@
                         $fcSrc = 'data:' . $fcMime . ';base64,' . base64_encode(\Illuminate\Support\Facades\Storage::disk('public')->get($sop->flowchart->file_path));
                     }
                 @endphp
-                <img src="{{ $fcSrc }}" class="flowchart-img" alt="Flowchart">
+                <div class="flowchart-box">
+                    <img src="{{ $fcSrc }}" class="flowchart-img" alt="Flowchart">
+                </div>
             @else
-                <p style="font-size: 10pt; color: #475569; font-style: italic;">
+                <p style="font-size: 10.5pt; color: #111827; font-style: italic; margin: 6px 0 12px 0;">
                     * Diagram alir terlampir dalam berkas PDF: <strong>{{ $sop->flowchart->nama_file }}</strong>
                 </p>
             @endif
@@ -375,54 +543,33 @@
 
         <!-- 7. LAMPIRAN -->
         @if($sop->regularAttachments->count() > 0)
-            <div class="section-header">7. LAMPIRAN PENDUKUNG</div>
+            <div class="section-header">7. LAMPIRAN</div>
             <table class="content-table">
-                <thead>
-                    <tr>
-                        <th style="width: 8%;">No</th>
-                        <th>Nama Berkas Lampiran</th>
-                        <th style="width: 20%;">Ukuran</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($sop->regularAttachments as $idx => $att)
-                        <tr>
-                            <td style="text-align: center;">{{ $idx + 1 }}</td>
-                            <td>{{ $att->nama_file }}</td>
-                            <td>{{ $att->formatted_size }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
+               
+              
             </table>
+
+            @foreach($sop->regularAttachments as $idx => $att)
+                @if($att->isImage() && $att->file_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($att->file_path))
+                    @php
+                        $attMime = $att->mime_type ?? 'image/png';
+                        $attSrc = 'data:' . $attMime . ';base64,' . base64_encode(\Illuminate\Support\Facades\Storage::disk('public')->get($att->file_path));
+                    @endphp
+                    <div class="attachment-preview-item">
+                        <div class="attachment-preview-caption">Lampiran {{ $idx + 1 }}. {{ $att->nama_file }}</div>
+                        <img src="{{ $attSrc }}" class="attachment-preview-img" alt="{{ $att->nama_file }}">
+                    </div>
+                @endif
+            @endforeach
         @endif
 
-        <!-- Signatures Table -->
-        <table class="signature-table">
-            <tr>
-                <td>
-                    <div class="signature-box">
-                        <div style="font-weight: bold; font-size: 10pt; color: #475569; text-transform: uppercase;">Dibuat Oleh:</div>
-                        <div class="signature-space"></div>
-                        <div class="signer-name">{{ $sop->creator?->name ?? 'Admin HRD' }}</div>
-                        <div class="signer-role">{{ $sop->creator?->getRoleLabel() ?? 'Admin' }}</div>
-                        <div style="font-size: 8pt; color: #94a3b8; margin-top: 4px;">
-                            Tgl: {{ $sop->created_at ? $sop->created_at->format('d/m/Y') : '-' }}
-                        </div>
-                    </div>
-                </td>
-                <td>
-                    <div class="signature-box">
-                        <div style="font-weight: bold; font-size: 10pt; color: #475569; text-transform: uppercase;">Disetujui Oleh:</div>
-                        <div class="signature-space"></div>
-                        <div class="signer-name">{{ $sop->approver?->name ?? 'Management / Super Admin' }}</div>
-                        <div class="signer-role">Super Administrator</div>
-                        <div style="font-size: 8pt; color: #94a3b8; margin-top: 4px;">
-                            Tgl: {{ $sop->approved_at ? $sop->approved_at->format('d/m/Y') : ($sop->isApproved() ? $sop->updated_at->format('d/m/Y') : 'MENUNGGU PERSETUJUAN') }}
-                        </div>
-                    </div>
-                </td>
-            </tr>
-        </table>
+        @unless($isPdf ?? false)
+        <!-- Footer (browser print preview) -->
+        <div class="page-footer">
+            <span>Dokumen ini dicetak dari Sistem SIMA HRD &mdash; CV. Sukahati Pratama</span>
+            <span>{{ $sop->nomor_dokumen }} &bull; Versi {{ $sop->version }}</span>
+        </div>
+        @endunless
 
     </div>
 
